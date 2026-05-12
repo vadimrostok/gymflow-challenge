@@ -1,0 +1,55 @@
+- recap your understanding of the challenge & discuss possible solutions with AI
+- settled on key tech: Expo, Expo Router, React Native Web (to reuse components as much as possible), use StyleSheet, single route tree, different routing-related layouts (e.g. breadcrumbs for web, stacks for mobile)
+- think through the initial UI prototype, the required components & their relation to routes
+- init expo app (default template)
+- deps:
+  - react-native-web
+  - react-hook-form (formik substitute)
+  - zod (json-schema substitute)
+  - tailwind (styling)
+  - mobx
+  - luxon (data/time/timezone, moment substitute (i know moment is deprecated))
+  - reanimated (animations)
+  - testing
+    - jest: unit tests for generic logic
+    - testing-library for ui stuff
+    - playwright for web e2e
+    - detox for mobile e2e
+- routes:
+  - / -> /users/
+    - /users/new
+    - /users/:id
+- animations:
+  - delete user
+  - add user
+  - users list loaded
+  - going back and forth through stack (mobile)
+  - splash screen
+  - background -> foreground
+- docs:
+  - _this_ (meta)
+  - AI-honed implementation plan
+  - README with installation, running instructions
+  - REVIEW + next steps (expo eject? nx? alt tech stacks?)
+- confirmation
+  - deletion (action sheet for ios?)
+- styling
+  - auto light/dark mode
+- data storage
+  - NSUserDefaults?
+  - async storage
+  - sqlite?
+  - mmkv?
+  - firebase/securestore
+- deep linking (e.g. com.vadymrostok.gymchlg/users/123 -> in-app)
+- backend integration
+  - auth (google/apple)
+    - expo auth session
+    - oauth, webflow?, verify token on backend
+    - (nope!) api key? signature timestamp + time checks? biometrics-only?
+    - biometrics? but for what? deleting users? logging in after a timeout? "secure mode"?
+  - firebase?
+  - (most likely) superbase?
+  - nodejs + sqlite/mongo?
+  - aws amplify?
+- some native module(s) integration to spice things up?
