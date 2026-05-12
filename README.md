@@ -1,50 +1,35 @@
-# Welcome to your Expo app 👋
+# Gymflow Challenge
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Shared Expo app for the Gymflow frontend task. The first implementation iteration includes the required users list, create/edit form, Zod validation, MobX state, responsive React Native Web UI, a layout-level theme switcher, and smoke tests.
 
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Run
 
 ```bash
-npm run reset-project
+npm install
+npm run web
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Expo can also launch native targets:
 
-## Learn more
+```bash
+npm run ios
+npm run android
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Test
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm run lint
+npm test
+npx tsc --noEmit
+```
 
-## Join the community
+## Current Scope
 
-Join our community of developers creating universal apps.
+- `/` redirects to `/users`.
+- `/users` shows the staff/member list and list-item remove actions.
+- `/users/new` creates a user.
+- `/users/[id]` edits a user and includes a form-level remove action.
+- The header theme button cycles auto, light, and dark modes on every screen.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+SQLite persistence, Supabase auth/sync, secure mode, deep-link export, Playwright, and Detox are planned next. See [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md).

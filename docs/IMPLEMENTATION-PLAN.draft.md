@@ -59,6 +59,9 @@
 1. Install deps:
 - deps: `npm i --save mobx-react-lite @supabase/supabase-js expo-sqlite react-native-web react-hook-form zod nativewind mobx luxon reanimated`
 - dev deps: `npm i --save-dev detox jest playwright @types/detox @types/playwright @types/jest @types/jest-react-native @types/react-native @types/react-native-web @types/react-hook-form @types/zod @types/nativewind @types/mobx @types/luxon @types/reanimated `
+1.1 Install dev tools:
+  - Eslint with some reasonable common config
+  - Add git hooks (lint-staged on commit, all tests on push)
 2. Create routes:
 - / & /users -> UsersList
 - /users/new -> UserForm
