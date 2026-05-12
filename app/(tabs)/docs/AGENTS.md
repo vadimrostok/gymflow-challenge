@@ -1,0 +1,13 @@
+- Run existing unit tests before summarising your changes. 
+- Run existing integration tests before summarising if you suspect they might be affected.
+- Cover new logic with unit tests, new UI with testing-library unit tests, but don't overdo it, cover the most important parts.
+- Cover milestone features with e2e tests for web and mobile separately.
+- Ensure responsive design still works after UI changes (at least by analysing the changes, and every once in a while, by running the app in MCP or via Computer Use).
+- Favor clarifying questions over making assumptions.
+- Favor long names over short and non-descriptive/ambiguous ones.
+- Feel free to install dependencies when needed without waiting for confirmation even if it only saves us 10+ lines of code while decreasing (or at least not worsening) cognitive effort required to understand the code; but do report that change in the final/summary output.
+- If you suspect I'm suggesting a bad design decision, let me know right away instead of silently going with it.
+- Non-trivial/non-obvious functionality warrants a comment explaining what it does and why it's necessary.
+- If you use an abbreviation, add a JSDoc-style comment explaining what the abbreviation stands for.
+- If you see debug logging or TODO comments I added, don't remove it unless explicitly being asked.
+- If some debug code breaks key functionality you need for your changes or to run tests, feel free to remove it without asking.
