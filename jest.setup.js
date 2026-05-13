@@ -1,6 +1,6 @@
-jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock'));
+jest.doMock('react-native-reanimated', () => require('react-native-reanimated/mock'));
 
-jest.mock('@expo/vector-icons', () => {
+jest.doMock('@expo/vector-icons', () => {
   const React = require('react');
   const { Text } = require('react-native');
 
@@ -9,7 +9,7 @@ jest.mock('@expo/vector-icons', () => {
   };
 });
 
-jest.mock('react-native-ui-datepicker', () => ({
+jest.doMock('react-native-ui-datepicker', () => ({
   __esModule: true,
   default: ({ date, onChange }) => {
     const React = require('react');
@@ -25,7 +25,7 @@ jest.mock('react-native-ui-datepicker', () => ({
   useDefaultStyles: () => ({}),
 }));
 
-jest.mock('react-native-picker-select', () => ({
+jest.doMock('react-native-picker-select', () => ({
   __esModule: true,
   default: ({ onValueChange, pickerProps, testID, value }) => {
     const React = require('react');

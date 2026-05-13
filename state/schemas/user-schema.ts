@@ -5,6 +5,11 @@ export const userRoles = ['STAFF', 'MEMBER'] as const;
 
 export type UserRole = (typeof userRoles)[number];
 
+export const userRoleOptions: { value: UserRole; label: string }[] = [
+  { value: 'STAFF', label: 'Staff' },
+  { value: 'MEMBER', label: 'Member' },
+];
+
 export const USER_FORM_ERROR_MESSAGES = {
   fullNameMin: 'Full name must be at least 3 characters.',
   fullNameMax: 'Full name must be 50 characters or less.',

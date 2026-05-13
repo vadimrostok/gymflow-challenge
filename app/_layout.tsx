@@ -1,8 +1,9 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import 'react-native-reanimated';
 import '../global.css';
 
@@ -35,6 +36,7 @@ export default function RootLayout() {
 }
 
 function RootLayoutContent() {
+  const router = useRouter();
   const colorScheme = useResolvedColorScheme();
   const palette = Colors[colorScheme];
 
@@ -43,6 +45,16 @@ function RootLayoutContent() {
       <Stack
         screenOptions={{
           contentStyle: { backgroundColor: palette.background },
+          headerLeft: ({ canGoBack }) =>
+            canGoBack ? (
+              <Pressable
+                accessibilityLabel="Back"
+                accessibilityRole="button"
+                onPress={() => router.back()}
+                style={styles.headerLeftButton}>
+                <MaterialIcons color={palette.text} name="arrow-back" size={28} />
+              </Pressable>
+            ) : null,
           headerRight: () => (
             <View style={styles.headerRight}>
               <HeaderActions />
@@ -50,7 +62,11 @@ function RootLayoutContent() {
           ),
           headerShadowVisible: false,
           headerStyle: { backgroundColor: palette.background },
-          headerTitleStyle: styles.headerTitle,
+          headerTitle: ({ children, tintColor }) => (
+            <Text style={[styles.headerTitle, { color: tintColor ?? palette.text }]}>
+              {children}
+            </Text>
+          ),
           headerTintColor: palette.text,
         }}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -71,12 +87,20 @@ function RootLayoutContent() {
 }
 
 const styles = {
+  headerLeftButton: {
+    marginLeft: 16,
+    minHeight: 44,
+    minWidth: 44,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
   headerRight: {
-    paddingRight: 16,
+    paddingRight: 32,
   },
   headerTitle: {
     fontFamily: FontFamily.reciaBold,
     fontSize: 18,
     fontWeight: '700' as const,
+    marginLeft: 16,
   },
 };

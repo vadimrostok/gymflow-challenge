@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Alert, Platform, Pressable, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
@@ -42,12 +43,20 @@ const UsersScreen = observer(function UsersScreen() {
               </ThemedText>
             </View>
             <Pressable
+              accessibilityLabel="Add User"
               accessibilityRole="button"
               onPress={() => router.push('/users/new')}
-              className="min-h-11 items-center justify-center rounded-lg bg-gymflow-primary px-4 active:opacity-75 dark:bg-gymflow-primaryDark">
-              <ThemedText type="defaultSemiBold" lightColor="#ffffff" darkColor="#002b36">
+              className="min-h-11 flex-row items-center gap-2.5 pr-[15px] active:opacity-75">
+              <ThemedText
+                type="defaultSemiBold"
+                lightColor="#2f855a"
+                darkColor="#6ee7a8"
+                className="leading-5">
                 Add User
               </ThemedText>
+              <View className="h-10 w-10 items-center justify-center rounded-full border border-gymflow-primary bg-gymflow-primary dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark">
+                <MaterialIcons name="person-add-alt-1" size={20} color="#ffffff" />
+              </View>
             </Pressable>
           </View>
         </Animated.View>

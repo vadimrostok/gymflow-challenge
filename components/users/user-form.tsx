@@ -11,7 +11,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import {
   userFormSchema,
-  userRoles,
+  userRoleOptions,
   type User,
   type UserFormValues,
   type UserRole,
@@ -78,6 +78,8 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
   const now = useRef<Date>(new Date());
   const defaultDatePickerStyles = useDefaultStyles();
   const defaultClassNames = useDefaultClassNames();
+  const datePickerEmphasisColor = colorScheme === 'dark' ? palette.accent : '#6c71c4';
+  const formBorderColor = colorScheme === 'dark' ? '#31565f' : '#ffffff';
   const datePickerStyles = useMemo(
     () => ({
       ...defaultDatePickerStyles,
@@ -85,8 +87,15 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
       button_prev_image: { tintColor: palette.text },
       day_label: { color: palette.text },
       disabled_label: { color: palette.mutedText },
-      month_label: { color: palette.text },
-      month_selector_label: { color: palette.text },
+      month_label: {
+        color: palette.text,
+        fontWeight: '600',
+      },
+      month_selector_label: {
+        color: datePickerEmphasisColor,
+        fontSize: 17,
+        fontWeight: '700',
+      },
       outside_label: { color: palette.mutedText },
       selected: {
         backgroundColor: palette.primaryButtonBackground,
@@ -97,24 +106,41 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
         backgroundColor: palette.primaryButtonBackground,
         borderColor: palette.primaryButtonBackground,
       },
-      selected_month_label: { color: palette.primaryButtonText },
+      selected_month_label: {
+        color: palette.primaryButtonText,
+        fontWeight: '700',
+      },
+      active_year_label: {
+        color: datePickerEmphasisColor,
+        fontWeight: '700',
+      },
       selected_year: {
         backgroundColor: palette.primaryButtonBackground,
         borderColor: palette.primaryButtonBackground,
       },
-      selected_year_label: { color: palette.primaryButtonText },
+      selected_year_label: {
+        color: palette.primaryButtonText,
+        fontWeight: '700',
+      },
       time_label: { color: palette.text },
       today_label: { color: palette.accent },
       weekday_label: { color: palette.mutedText },
-      year_label: { color: palette.text },
-      year_selector_label: { color: palette.text },
+      year_label: {
+        color: palette.text,
+        fontWeight: '600',
+      },
+      year_selector_label: {
+        color: datePickerEmphasisColor,
+        fontSize: 17,
+        fontWeight: '700',
+      },
     }),
-    [defaultDatePickerStyles, palette]
+    [datePickerEmphasisColor, defaultDatePickerStyles, palette]
   );
   const pickerStyles = useMemo<PickerStyle>(() => {
     const pickerInput = {
       backgroundColor: palette.surface,
-      borderColor: palette.border,
+      borderColor: formBorderColor,
       borderRadius: 8,
       borderWidth: 1,
       color: palette.text,
@@ -146,7 +172,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
         top: 13,
       },
     };
-  }, [palette]);
+  }, [formBorderColor, palette]);
 
   return (
     <View className="w-full gap-6">
@@ -163,7 +189,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
               onChangeText={onChange}
               placeholder="Jane Smith"
               placeholderTextColor={palette.mutedText}
-              className="min-h-12 rounded-lg border border-solarized-base1 bg-solarized-base2 px-3.5 text-base text-solarized-base02 dark:border-solarized-base01 dark:bg-solarized-base02 dark:text-solarized-base2"
+              className="min-h-12 rounded-lg border border-white bg-solarized-base2 px-3.5 text-base text-solarized-base02 dark:border-[#31565f] dark:bg-solarized-base02 dark:text-solarized-base2"
               value={value}
             />
           )}
@@ -193,10 +219,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
                       />
                     )
               }
-              items={userRoles.map((role) => ({
-                label: role === 'STAFF' ? 'Staff' : 'Member',
-                value: role,
-              }))}
+              items={userRoleOptions}
               onValueChange={(selectedRole) => {
                 onChange(selectedRole ?? '');
               }}
@@ -226,7 +249,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           name="dateOfBirth"
           render={({ field: { onChange, value } }) => (
             <DateTimePicker
-              className="rounded-lg border border-solarized-base1 bg-solarized-base2 p-3 dark:border-solarized-base01 dark:bg-solarized-base02"
+              className="rounded-lg border border-white bg-solarized-base2 p-3 dark:border-[#31565f] dark:bg-solarized-base02"
               mode="single"
               date={getDefaultDatePickerValue(value ?? '')}
               timeZone="UTC"
@@ -235,25 +258,25 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
               maxDate={now.current}
               classNames={{
                 ...defaultClassNames,
-                active_year_label: 'text-solarized-base02 dark:text-solarized-base2',
                 day: `${defaultClassNames.day} hover:bg-[#f4e7b5] dark:hover:bg-[#3a3f2c]`,
                 day_label: `${defaultClassNames.day_label} text-solarized-base02 dark:text-solarized-base2`,
                 disabled: 'opacity-40',
                 disabled_label: 'text-solarized-base1 dark:text-solarized-base01',
-                month_label: 'text-solarized-base02 dark:text-solarized-base2',
-                month_selector_label: 'text-lg font-semibold text-solarized-base02 dark:text-solarized-base2',
+                month_label: 'font-semibold',
+                month_selector_label: 'text-xl font-bold',
                 outside_label: 'text-solarized-base1 dark:text-solarized-base01',
                 selected: 'border-gymflow-primary bg-gymflow-primary dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark',
-                selected_label: 'font-bold text-white dark:text-solarized-base03',
-                selected_month_label: 'font-bold text-white dark:text-solarized-base03',
-                selected_year_label: 'font-bold text-white dark:text-solarized-base03',
+                selected_label: 'font-bold',
+                selected_month_label: 'font-bold',
+                selected_year_label: 'font-bold',
                 time_label: 'text-solarized-base02 dark:text-solarized-base2',
                 time_selected_indicator: 'bg-solarized-base2 dark:bg-solarized-base02',
                 today: 'border-solarized-yellow',
                 today_label: 'text-solarized-yellow',
                 weekday_label: 'text-sm uppercase text-solarized-base01 dark:text-solarized-base1',
-                year_label: 'text-solarized-base02 dark:text-solarized-base2',
-                year_selector_label: 'text-lg font-semibold text-solarized-base02 dark:text-solarized-base2',
+                year_label: 'font-semibold',
+                year_selector_label: 'text-xl font-bold',
+                active_year_label: 'font-semibold',
               }}
             />
           )}

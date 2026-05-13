@@ -24,7 +24,7 @@ export function UserListItem({ user, onDelete }: UserListItemProps) {
       entering={FadeInRight.duration(220)}
       exiting={FadeOutLeft.duration(160)}
       layout={LinearTransition.springify().damping(18)}>
-      <View className="w-full flex-row gap-3 rounded-lg border border-white bg-solarized-base2 p-3.5 dark:bg-solarized-base02">
+      <View className="w-full flex-row gap-3 rounded-lg border border-white bg-solarized-base2 p-3.5 dark:border-[#31565f] dark:bg-solarized-base02">
         <Link href={`/users/${user.id}`} asChild>
           <Pressable accessibilityRole="link" className="min-h-14 flex-1 justify-center gap-1.5">
             <View className="flex-row flex-wrap items-center gap-2">
@@ -60,7 +60,7 @@ export function UserListItem({ user, onDelete }: UserListItemProps) {
           onFocus={() => setIsDeleteTooltipVisible(true)}
           onHoverIn={() => setIsDeleteTooltipVisible(true)}
           onHoverOut={() => setIsDeleteTooltipVisible(false)}
-          className="relative h-10 w-10 items-center justify-center self-center rounded-lg border border-solarized-red bg-solarized-red active:opacity-70">
+          className="relative h-10 w-10 items-center justify-center self-center rounded-full border border-solarized-red bg-solarized-red active:opacity-70">
           <MaterialIcons color="#ffffff" name="delete-outline" size={20} />
           {isDeleteTooltipVisible ? (
             <View
