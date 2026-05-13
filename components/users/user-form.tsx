@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialIcons } from '@expo/vector-icons';
 import { DateTime } from 'luxon';
 import { Controller, useForm } from 'react-hook-form';
+import { cssInterop } from 'nativewind';
 import { Platform, Pressable, TextInput, View } from 'react-native';
 import { useMemo, useRef, useState } from 'react';
 import RNPickerSelect, { type PickerStyle } from 'react-native-picker-select';
@@ -17,6 +18,14 @@ import {
   type UserRole,
 } from '@/state/schemas/user-schema';
 import { useResolvedColorScheme } from '@/state/context/theme-mode';
+
+/**
+ * Codex: Maps NativeWind classes on the third-party picker to its root style prop.
+ * NOTE: I encountered this weird error: `className` string didn't reach
+ * react-native-web's DOM output, apparently it's converted into RN's `style` structure
+ * and then into web-friendly CSS-defined classes. Worth investigating further.
+ */
+cssInterop(DateTimePicker, { className: 'style' });
 
 type UserFormProps = {
   mode: 'create' | 'edit';
