@@ -12,7 +12,7 @@ describe('UserForm', () => {
     );
 
     fireEvent.changeText(screen.getByLabelText('Full Name'), 'Maya Angelou');
-    fireEvent.press(screen.getByLabelText('Staff'));
+    fireEvent(screen.getByTestId('role-picker'), 'onValueChange', 'STAFF');
     fireEvent.changeText(screen.getByLabelText('Date of Birthday'), '1928-04-04');
     fireEvent.press(screen.getByText('Create User'));
 
@@ -36,6 +36,7 @@ describe('UserForm', () => {
     fireEvent.press(screen.getByText('Create User'));
 
     expect(await screen.findByText('Full name must be at least 3 characters.')).toBeTruthy();
+    expect(await screen.findByText('Choose Staff or Member role.')).toBeTruthy();
   });
 
   it('renders form-level removal for existing users', () => {
@@ -57,5 +58,6 @@ describe('UserForm', () => {
     );
 
     expect(screen.getByText('Remove User')).toBeTruthy();
+    expect(screen.queryByText('Select an item...')).toBeNull();
   });
 });
