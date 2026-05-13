@@ -3,8 +3,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { DateTime } from 'luxon';
 import { Controller, useForm } from 'react-hook-form';
 import { Platform, Pressable, TextInput, View } from 'react-native';
-import { useMemo, useRef } from 'react';
-import RNPickerSelect from 'react-native-picker-select';
+import { useMemo, useRef, useState } from 'react';
+import RNPickerSelect, { type PickerStyle } from 'react-native-picker-select';
 import DateTimePicker, { DateType, useDefaultStyles, useDefaultClassNames } from 'react-native-ui-datepicker';
 
 import { ThemedText } from '@/components/themed-text';
@@ -65,6 +65,7 @@ function parseDatePickerValue(date: DateType) {
 export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: UserFormProps) {
   const colorScheme = useResolvedColorScheme();
   const palette = Colors[colorScheme];
+  const [isDeleteTooltipVisible, setIsDeleteTooltipVisible] = useState(false);
   const {
     control,
     handleSubmit,
@@ -110,7 +111,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
     }),
     [defaultDatePickerStyles, palette]
   );
-  const pickerStyles = useMemo(() => {
+  const pickerStyles = useMemo<PickerStyle>(() => {
     const pickerInput = {
       backgroundColor: palette.surface,
       borderColor: palette.border,
@@ -140,7 +141,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
         color: palette.mutedText,
       },
       iconContainer: {
-        pointerEvents: 'none',
+        pointerEvents: 'none' as const,
         right: 12,
         top: 13,
       },
@@ -204,8 +205,8 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
                   ? { label: 'Choose role', value: '', color: palette.mutedText }
                   : {}
               }
+              pickerProps={{ testID: 'role-picker' }}
               style={pickerStyles}
-              testID="role-picker"
               useNativeAndroidPickerStyle={false}
               value={value}
             />
@@ -227,7 +228,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
             <DateTimePicker
               className="rounded-lg border border-solarized-base1 bg-solarized-base2 p-3 dark:border-solarized-base01 dark:bg-solarized-base02"
               mode="single"
-              date={getDefaultDatePickerValue(value)}
+              date={getDefaultDatePickerValue(value ?? '')}
               timeZone="UTC"
               onChange={({ date }) => onChange(parseDatePickerValue(date))}
               styles={datePickerStyles}
@@ -282,11 +283,28 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
         {mode === 'edit' && onDelete ? (
           <Pressable
             accessibilityRole="button"
+            onBlur={() => setIsDeleteTooltipVisible(false)}
+            onFocus={() => setIsDeleteTooltipVisible(true)}
+            onHoverIn={() => setIsDeleteTooltipVisible(true)}
+            onHoverOut={() => setIsDeleteTooltipVisible(false)}
             onPress={onDelete}
-            className="min-h-12 items-center justify-center rounded-lg bg-solarized-red px-[18px] active:opacity-75">
+            className="relative min-h-12 flex-row items-center justify-center gap-2 rounded-lg bg-solarized-red px-[18px] active:opacity-75">
+            <MaterialIcons color="#ffffff" name="delete-outline" size={18} />
             <ThemedText type="defaultSemiBold" lightColor="#ffffff" darkColor="#ffffff">
               Remove User
             </ThemedText>
+            {isDeleteTooltipVisible ? (
+              <View
+                className="absolute bottom-[56px] left-1/2 w-24 rounded-md bg-solarized-base02 px-2 py-1.5 dark:bg-solarized-base2"
+                style={{ transform: [{ translateX: -48 }] }}>
+                <ThemedText
+                  lightColor="#fdf6e3"
+                  darkColor="#002b36"
+                  className="text-center text-xs leading-[14px]">
+                  delete user
+                </ThemedText>
+              </View>
+            ) : null}
           </Pressable>
         ) : null}
       </View>

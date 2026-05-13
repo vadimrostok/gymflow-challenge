@@ -1,3 +1,14 @@
+jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock'));
+
+jest.mock('@expo/vector-icons', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+
+  return {
+    MaterialIcons: ({ name }) => React.createElement(Text, null, name),
+  };
+});
+
 jest.mock('react-native-ui-datepicker', () => ({
   __esModule: true,
   default: ({ date, onChange }) => {
@@ -16,14 +27,14 @@ jest.mock('react-native-ui-datepicker', () => ({
 
 jest.mock('react-native-picker-select', () => ({
   __esModule: true,
-  default: ({ onValueChange, testID, value }) => {
+  default: ({ onValueChange, pickerProps, testID, value }) => {
     const React = require('react');
     const { TextInput } = require('react-native');
 
     return React.createElement(TextInput, {
       accessibilityLabel: 'Role',
       onValueChange,
-      testID,
+      testID: testID ?? pickerProps?.testID,
       value,
     });
   },

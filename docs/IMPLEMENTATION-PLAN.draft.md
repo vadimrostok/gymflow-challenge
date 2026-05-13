@@ -125,20 +125,21 @@
 - layout
   + limit list width and centre on web
   - add settings button near theme button
-  - userform: "remove" button: red, icon, with tooltip
+  + userform: "remove" button: red, icon, with tooltip
 + make light/dark mode button 2-state and add "auto" checkbox nearby, when enabled button inactive
 + "state" vs "features" folders, wtf
 - components/ui? why "ui"?
 - general styling: 
   - fonts
   - remove button should be icon with tooltip
-  - flexboxing does not flexboxin in user list item
-  - fix non-contrasty color combinations
+    - center tooltips above/below the button it's attached to   
+  + flexboxing does not flexboxin in user list item
+  + fix non-contrasty color combinations
 + theme-mode -> theme-context
-- ParallaxScrollView for user form
+- ParallaxScrollView for user form (you can use just a different-color background instead of a picture of parallaxing header)
 + back button disappears when loading user form page from scratch (web)
 - custom (styled) delete confirmation (web)
-- showcase validation let's use a dropdown for role, with no value selected when new user form is loaded (so that "choose role" error is active)
++ showcase validation let's use a dropdown for role, with no value selected when new user form is loaded (so that "choose role" error is active)
 + datepicker (npm install react-native-ui-datepicker)
 - user list item, increase clickable area
-- use nativewind (totally forgot)
++ use nativewind (totally forgot)

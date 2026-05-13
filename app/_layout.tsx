@@ -1,11 +1,14 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { View } from 'react-native';
 import 'react-native-reanimated';
 import '../global.css';
 
-import { ThemeModeButton } from '@/components/theme-mode-button';
+import { HeaderActions } from '@/components/header-actions';
 //import { RouteAwareBackButton } from '@/components/navigation/route-aware-back';
+import { FontFamily, reciaFontAssets } from '@/constants/fonts';
 import { Colors } from '@/constants/theme';
 import { ThemeModeProvider, useResolvedColorScheme } from '@/state/context/theme-mode';
 import { StoresProvider } from '@/state/context/users-context';
@@ -16,6 +19,12 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+  const [areFontsLoaded] = useFonts(reciaFontAssets);
+
+  if (!areFontsLoaded) {
+    return null;
+  }
+
   return (
     <ThemeModeProvider>
       <StoresProvider>
@@ -34,9 +43,11 @@ function RootLayoutContent() {
       <Stack
         screenOptions={{
           contentStyle: { backgroundColor: palette.background },
-          headerLeftContainerStyle: styles.headerLeft,
-          headerRight: () => <ThemeModeButton />,
-          headerRightContainerStyle: styles.headerRight,
+          headerRight: () => (
+            <View style={styles.headerRight}>
+              <HeaderActions />
+            </View>
+          ),
           headerShadowVisible: false,
           headerStyle: { backgroundColor: palette.background },
           headerTitleStyle: styles.headerTitle,
@@ -52,6 +63,7 @@ function RootLayoutContent() {
           name="users/[id]"
           options={{ headerBackTitle: 'Users', title: 'Edit User' }}
         />
+        <Stack.Screen name="settings" options={{ headerBackTitle: 'Users', title: 'Settings' }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
@@ -59,13 +71,11 @@ function RootLayoutContent() {
 }
 
 const styles = {
-  headerLeft: {
-    paddingLeft: 24,
-  },
   headerRight: {
-    paddingRight: 24,
+    paddingRight: 16,
   },
   headerTitle: {
+    fontFamily: FontFamily.reciaBold,
     fontSize: 18,
     fontWeight: '700' as const,
   },
