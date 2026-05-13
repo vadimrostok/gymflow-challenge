@@ -5,15 +5,15 @@ import 'react-native-reanimated';
 
 import { ThemeModeButton } from '@/components/theme-mode-button';
 import { Colors } from '@/constants/theme';
-import { ThemeModeProvider, useResolvedColorScheme } from '@/state/theme-mode';
-import { UsersStoreProvider } from '@/state/users-context';
+import { ThemeModeProvider, useResolvedColorScheme } from '@/state/context/theme-mode';
+import { StoresProvider } from '@/state/context/users-context';
 
 export default function RootLayout() {
   return (
     <ThemeModeProvider>
-      <UsersStoreProvider>
+      <StoresProvider>
         <RootLayoutContent />
-      </UsersStoreProvider>
+      </StoresProvider>
     </ThemeModeProvider>
   );
 }

@@ -4,9 +4,9 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { UserForm } from '@/components/users/user-form';
 import { Colors } from '@/constants/theme';
-import type { UserFormValues } from '@/features/users/user-schema';
-import { useResolvedColorScheme } from '@/state/theme-mode';
-import { useUsersStore } from '@/state/users-context';
+import type { UserFormValues } from '@/state/schemas/user-schema';
+import { useResolvedColorScheme } from '@/state/context/theme-mode';
+import { useUsersStore } from '@/state/context/users-context';
 
 export default function NewUserScreen() {
   const router = useRouter();
@@ -41,4 +41,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-

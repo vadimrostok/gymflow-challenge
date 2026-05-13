@@ -3,7 +3,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { UserListItem } from '@/components/users/user-list-item';
-import type { User } from '@/features/users/user-schema';
+import type { User } from '@/state/schemas/user-schema';
 
 type UsersListProps = {
   users: User[];
@@ -42,4 +42,3 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 });
-

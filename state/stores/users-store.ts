@@ -5,7 +5,7 @@ import {
   createTimestamp,
   type User,
   type UserFormValues,
-} from '@/features/users/user-schema';
+} from '@/state/schemas/user-schema';
 
 const initialUsers: User[] = [
   {
@@ -77,4 +77,3 @@ export class UsersStore {
 export function createUsersStore() {
   return new UsersStore();
 }
-

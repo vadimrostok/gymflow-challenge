@@ -2,7 +2,7 @@ import { Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
-import { useThemeMode } from '@/state/theme-mode';
+import { useThemeMode } from '@/state/context/theme-mode';
 
 const themeModeLabels = {
   auto: 'Auto theme',
@@ -55,4 +55,3 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 });
-

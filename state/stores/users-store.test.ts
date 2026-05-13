@@ -1,4 +1,4 @@
-import { createUsersStore } from '@/features/users/users-store';
+import { createUsersStore } from '@/state/stores/users-store';
 
 describe('UsersStore', () => {
   it('creates, updates, and deletes users', () => {
@@ -27,4 +27,3 @@ describe('UsersStore', () => {
     expect(usersStore.findUser(createdUser.id)).toBeUndefined();
   });
 });
-

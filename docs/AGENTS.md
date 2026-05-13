@@ -11,3 +11,4 @@
 - If you use an abbreviation, add a JSDoc-style comment explaining what the abbreviation stands for.
 - If you see debug logging or TODO comments I added, don't remove it unless explicitly being asked.
 - If some debug code breaks key functionality you need for your changes or to run tests, feel free to remove it without asking.
+- Add types wherever possible except cases where as const inference is preferable.

@@ -5,9 +5,9 @@ import { Alert, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { UsersList } from '@/components/users/users-list';
 import { Colors } from '@/constants/theme';
-import type { User } from '@/features/users/user-schema';
-import { useResolvedColorScheme } from '@/state/theme-mode';
-import { useUsersStore } from '@/state/users-context';
+import type { User } from '@/state/schemas/user-schema';
+import { useResolvedColorScheme } from '@/state/context/theme-mode';
+import { useUsersStore } from '@/state/context/users-context';
 
 const UsersScreen = observer(function UsersScreen() {
   const usersStore = useUsersStore();
@@ -86,4 +86,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-

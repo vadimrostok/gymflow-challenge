@@ -10,8 +10,8 @@ import {
   type User,
   type UserFormValues,
   type UserRole,
-} from '@/features/users/user-schema';
-import { useResolvedColorScheme } from '@/state/theme-mode';
+} from '@/state/schemas/user-schema';
+import { useResolvedColorScheme } from '@/state/context/theme-mode';
 
 type UserFormProps = {
   mode: 'create' | 'edit';
@@ -253,4 +253,3 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
 });
-

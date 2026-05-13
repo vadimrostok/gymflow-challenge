@@ -4,8 +4,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
-import type { User } from '@/features/users/user-schema';
-import { useResolvedColorScheme } from '@/state/theme-mode';
+import type { User } from '@/state/schemas/user-schema';
+import { useResolvedColorScheme } from '@/state/context/theme-mode';
 
 type UserListItemProps = {
   user: User;
@@ -93,4 +93,3 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 });
-

@@ -120,3 +120,18 @@
   - So far it'd have only a single checkbox: secure mode. When enabled, user is logged out each time the app is closed/goes into background. When enabling, user is asked for permission to use biometric authentication for login. If allowed, user is logged in via FaceId/Fingerprint instead of Google/Apple auth buttons.
 15. Update README
 16. Add web and mobile e2e smoke tests. It should go through auth (if we can simulate it easily, otherwise let's skip auth), creates a few users, goes back and forth between pages, deletes a user, test confirms UI state at each step.
+
+# iteration 3 (post boilerplate generation)
+- layout
+  - limit list width and centre on web
+  - add settings button near theme button
+  - userform: remove button near the name, red, icon, with tooltip
+- make light/dark mode button 2-state and add "auto" checkbox nearby, when enabled button inactive
+- "state" vs "features" folders, wtf
+- components/ui? why "ui"?
+- general styling: 
+  - fonts
+  - remove button should be icon with tooltip
+  - flexboxing does not flexboxin in user list item
+  - fix non-contrasty color combinations
+- theme-mode -> theme-context
