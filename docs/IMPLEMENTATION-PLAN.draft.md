@@ -135,3 +135,6 @@
   - flexboxing does not flexboxin in user list item
   - fix non-contrasty color combinations
 - theme-mode -> theme-context
+- ParallaxScrollView for user form
+- back button disappears when loading user form page from scratch (web)
+- custom (styled) delete confirmation (web)

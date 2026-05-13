@@ -54,6 +54,7 @@ export function UserListItem({ user, onDelete }: UserListItemProps) {
 
 const styles = StyleSheet.create({
   card: {
+    width: '100%',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',

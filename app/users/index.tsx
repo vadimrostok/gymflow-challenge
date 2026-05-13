@@ -4,6 +4,7 @@ import { Alert, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { UsersList } from '@/components/users/users-list';
+import { USER_SCREEN_MAX_WIDTH } from '@/constants/layout';
 import { Colors } from '@/constants/theme';
 import type { User } from '@/state/schemas/user-schema';
 import { useResolvedColorScheme } from '@/state/context/theme-mode';
@@ -33,27 +34,33 @@ const UsersScreen = observer(function UsersScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: palette.background }]}>
-      <View style={styles.header}>
-        <View style={styles.headerText}>
-          <ThemedText type="title">Gymflow Users</ThemedText>
-          <ThemedText style={{ color: palette.mutedText }}>
-            Manage staff and member profiles across mobile and web.
-          </ThemedText>
-        </View>
-        <Link href="/users/new" asChild>
-          <Pressable
-            accessibilityRole="button"
-            style={({ pressed }) => [
-              styles.addButton,
-              { backgroundColor: palette.tint, opacity: pressed ? 0.74 : 1 },
-            ]}>
-            <ThemedText type="defaultSemiBold" style={{ color: palette.onTint }}>
-              Add User
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <View style={styles.headerText}>
+            <ThemedText type="title">Gymflow Users</ThemedText>
+            <ThemedText style={{ color: palette.mutedText }}>
+              Manage staff and member profiles across mobile and web.
             </ThemedText>
-          </Pressable>
-        </Link>
+          </View>
+          <Link href="/users/new" asChild>
+            <Pressable
+              accessibilityRole="button"
+              style={({ pressed }) => [
+                styles.addButton,
+                { backgroundColor: palette.tint, opacity: pressed ? 0.74 : 1 },
+              ]}>
+              <ThemedText type="defaultSemiBold" style={{ color: palette.onTint }}>
+                Add User
+              </ThemedText>
+            </Pressable>
+          </Link>
+        </View>
+        <UsersList
+          containerStyle={{ maxWidth: USER_SCREEN_MAX_WIDTH }}
+          onDeleteUser={requestDeleteUser}
+          users={usersStore.sortedUsers}
+        />
       </View>
-      <UsersList onDeleteUser={requestDeleteUser} users={usersStore.sortedUsers} />
     </View>
   );
 });
@@ -81,6 +88,10 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 6,
     minWidth: 240,
+  },
+  content: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   screen: {
     flex: 1,

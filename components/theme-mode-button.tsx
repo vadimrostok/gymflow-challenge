@@ -17,12 +17,12 @@ const themeModeSymbols = {
 };
 
 export function ThemeModeButton() {
-  const { mode, resolvedColorScheme, cycleThemeMode } = useThemeMode();
+  const { resolvedColorScheme, cycleThemeMode } = useThemeMode();
   const palette = Colors[resolvedColorScheme];
 
   return (
     <Pressable
-      accessibilityLabel={themeModeLabels[mode]}
+      accessibilityLabel={themeModeLabels[resolvedColorScheme]}
       accessibilityRole="button"
       onPress={cycleThemeMode}
       style={({ pressed }) => [
@@ -34,7 +34,7 @@ export function ThemeModeButton() {
         },
       ]}>
       <ThemedText type="defaultSemiBold" style={[styles.label, { color: palette.tint }]}>
-        {themeModeSymbols[mode]}
+        {themeModeSymbols[resolvedColorScheme]}
       </ThemedText>
     </Pressable>
   );

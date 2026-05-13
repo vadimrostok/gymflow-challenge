@@ -47,6 +47,7 @@ describe('UserForm', () => {
           role: 'MEMBER',
           dateOfBirth: '',
           updatedAt: '2026-05-13T00:00:00.000Z',
+          createdAt: '2026-05-13T00:00:00.000Z',
         }}
         mode="edit"
         onCancel={jest.fn()}

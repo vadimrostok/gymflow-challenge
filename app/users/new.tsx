@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { UserForm } from '@/components/users/user-form';
+import { USER_SCREEN_MAX_WIDTH } from '@/constants/layout';
 import { Colors } from '@/constants/theme';
 import type { UserFormValues } from '@/state/schemas/user-schema';
 import { useResolvedColorScheme } from '@/state/context/theme-mode';
@@ -23,7 +24,11 @@ export default function NewUserScreen() {
     <View style={[styles.screen, { backgroundColor: palette.background }]}>
       <View style={styles.content}>
         <ThemedText type="title">Create User</ThemedText>
-        <UserForm mode="create" onCancel={() => router.back()} onSubmit={createUser} />
+        <UserForm
+          mode="create"
+          onCancel={() => router.canGoBack() ? router.back() : router.replace('/users')}
+          onSubmit={createUser}
+        />
       </View>
     </View>
   );
@@ -33,7 +38,7 @@ const styles = StyleSheet.create({
   content: {
     alignSelf: 'center',
     gap: 22,
-    maxWidth: 720,
+    maxWidth: USER_SCREEN_MAX_WIDTH,
     padding: 20,
     width: '100%',
   },

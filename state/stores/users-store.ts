@@ -14,6 +14,7 @@ const initialUsers: User[] = [
     role: 'STAFF',
     dateOfBirth: '1815-12-10',
     updatedAt: createTimestamp(),
+    createdAt: createTimestamp(),
   },
   {
     id: 'demo-katherine-johnson',
@@ -21,6 +22,7 @@ const initialUsers: User[] = [
     role: 'MEMBER',
     dateOfBirth: '1918-08-26',
     updatedAt: createTimestamp(),
+    createdAt: createTimestamp(),
   },
 ];
 
@@ -46,6 +48,7 @@ export class UsersStore {
       ...values,
       id: createLocalUserId(),
       updatedAt: createTimestamp(),
+      createdAt: createTimestamp(),
     };
 
     this.users.push(newUser);

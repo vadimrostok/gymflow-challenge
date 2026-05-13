@@ -120,7 +120,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
             styles.primaryButton,
             { backgroundColor: palette.tint, opacity: pressed ? 0.74 : 1 },
           ]}>
-          <ThemedText style={styles.primaryButtonText}>
+          <ThemedText style={[styles.primaryButtonText, { color: palette.onTint }]}>
             {mode === 'create' ? 'Create User' : 'Save Changes'}
           </ThemedText>
         </Pressable>
@@ -226,7 +226,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   primaryButtonText: {
-    color: '#ffffff',
     fontWeight: '700',
   },
   roleButton: {

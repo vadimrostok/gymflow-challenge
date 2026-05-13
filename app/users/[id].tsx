@@ -4,6 +4,7 @@ import { Alert, Platform, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { UserForm } from '@/components/users/user-form';
+import { USER_SCREEN_MAX_WIDTH } from '@/constants/layout';
 import { Colors } from '@/constants/theme';
 import type { UserFormValues } from '@/state/schemas/user-schema';
 import { useResolvedColorScheme } from '@/state/context/theme-mode';
@@ -62,7 +63,7 @@ const EditUserScreen = observer(function EditUserScreen() {
         <UserForm
           initialUser={existingUser}
           mode="edit"
-          onCancel={() => router.back()}
+          onCancel={() => router.canGoBack() ? router.back() : router.replace('/users')}
           onDelete={requestDeleteUser}
           onSubmit={saveUser}
         />
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
   content: {
     alignSelf: 'center',
     gap: 22,
-    maxWidth: 720,
+    maxWidth: USER_SCREEN_MAX_WIDTH,
     padding: 20,
     width: '100%',
   },
