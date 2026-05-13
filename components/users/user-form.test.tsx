@@ -22,8 +22,7 @@ describe('UserForm', () => {
           fullName: 'Maya Angelou',
           role: 'STAFF',
           dateOfBirth: '1928-04-04',
-        },
-        undefined
+        }
       );
     });
   });

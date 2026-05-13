@@ -13,3 +13,18 @@ jest.mock('react-native-ui-datepicker', () => ({
   useDefaultClassNames: () => ({}),
   useDefaultStyles: () => ({}),
 }));
+
+jest.mock('react-native-picker-select', () => ({
+  __esModule: true,
+  default: ({ onValueChange, testID, value }) => {
+    const React = require('react');
+    const { TextInput } = require('react-native');
+
+    return React.createElement(TextInput, {
+      accessibilityLabel: 'Role',
+      onValueChange,
+      testID,
+      value,
+    });
+  },
+}));

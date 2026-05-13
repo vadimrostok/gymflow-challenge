@@ -1,17 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { MaterialIcons } from '@expo/vector-icons';
 import { DateTime } from 'luxon';
 import { Controller, useForm } from 'react-hook-form';
-import { Pressable, TextInput, View } from 'react-native';
+import { Platform, Pressable, TextInput, View } from 'react-native';
 import { useMemo, useRef } from 'react';
 import RNPickerSelect from 'react-native-picker-select';
 import DateTimePicker, { DateType, useDefaultStyles, useDefaultClassNames } from 'react-native-ui-datepicker';
-import { z } from 'zod';
 
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import {
   userFormSchema,
-  USER_FORM_ERROR_MESSAGES,
   userRoles,
   type User,
   type UserFormValues,
@@ -63,26 +62,6 @@ function parseDatePickerValue(date: DateType) {
   return DateTime.fromJSDate(date.toDate(), { zone: 'utc' }).toISODate() ?? '';
 }
 
-function toISODate(date: DateType) {
-  if (!date) {
-    return '';
-  }
-
-  if (date instanceof Date) {
-    return DateTime.fromJSDate(date, { zone: 'utc' }).toISODate() ?? '';
-  }
-
-  if (typeof date === 'number') {
-    return DateTime.fromMillis(date, { zone: 'utc' }).toISODate() ?? '';
-  }
-
-  if (typeof date === 'string') {
-    return DateTime.fromISO(date, { zone: 'utc' }).toISODate() ?? '';
-  }
-
-  return DateTime.fromISO(date.format('YYYY-MM-DD'), { zone: 'utc' }).toISODate() ?? '';
-}
-
 export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: UserFormProps) {
   const colorScheme = useResolvedColorScheme();
   const palette = Colors[colorScheme];
@@ -131,6 +110,42 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
     }),
     [defaultDatePickerStyles, palette]
   );
+  const pickerStyles = useMemo(() => {
+    const pickerInput = {
+      backgroundColor: palette.surface,
+      borderColor: palette.border,
+      borderRadius: 8,
+      borderWidth: 1,
+      color: palette.text,
+      fontSize: 16,
+      minHeight: 48,
+      paddingHorizontal: 14,
+      paddingRight: 42,
+      paddingVertical: 12,
+      width: '100%',
+    };
+
+    return {
+      viewContainer: {
+        alignSelf: 'stretch',
+        width: '100%',
+      },
+      inputIOS: pickerInput,
+      inputAndroid: pickerInput,
+      inputWeb: {
+        ...pickerInput,
+        outlineColor: palette.primaryButtonBackground,
+      },
+      placeholder: {
+        color: palette.mutedText,
+      },
+      iconContainer: {
+        pointerEvents: 'none',
+        right: 12,
+        top: 13,
+      },
+    };
+  }, [palette]);
 
   return (
     <View className="w-full gap-6">
@@ -166,6 +181,17 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           name="role"
           render={({ field: { onChange, value } }) => (
             <RNPickerSelect
+              Icon={
+                Platform.OS === 'web'
+                  ? undefined
+                  : () => (
+                      <MaterialIcons
+                        color={palette.mutedText}
+                        name="keyboard-arrow-down"
+                        size={22}
+                      />
+                    )
+              }
               items={userRoles.map((role) => ({
                 label: role === 'STAFF' ? 'Staff' : 'Member',
                 value: role,
@@ -178,22 +204,9 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
                   ? { label: 'Choose role', value: '', color: palette.mutedText }
                   : {}
               }
-              /*style={{
-                inputIOS: [
-                  styles.pickerInput,
-                  { color: palette.text, backgroundColor: palette.surface, borderColor: palette.border },
-                ],
-                inputAndroid: [
-                  styles.pickerInput,
-                  { color: palette.text, backgroundColor: palette.surface, borderColor: palette.border },
-                ],
-                inputWeb: [
-                  styles.pickerInput,
-                  { color: palette.text, backgroundColor: palette.surface, borderColor: palette.border },
-                ],
-                placeholder: { color: palette.mutedText, fontStyle: 'italic' },
-              }}*/
+              style={pickerStyles}
               testID="role-picker"
+              useNativeAndroidPickerStyle={false}
               value={value}
             />
           )}
@@ -255,15 +268,8 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
         <Pressable
           accessibilityRole="button"
           onPress={handleSubmit((values) => onSubmit({ ...values, role: values.role as UserRole }))}
-          className="min-h-12 items-center justify-center rounded-lg bg-gymflow-primary px-[18px] active:opacity-75 dark:bg-gymflow-primaryDark"
-          /*style={({ pressed }) => [
-            styles.primaryButton,
-            { backgroundColor: palette.primaryButtonBackground, opacity: pressed ? 0.74 : 1 },
-          ]}>*/
-        >
-          <ThemedText
-            /*style={[styles.primaryButtonText, { color: palette.primaryButtonText }]}*/
-            lightColor="#ffffff" darkColor="#002b36" className="font-bold">
+          className="min-h-12 items-center justify-center rounded-lg bg-gymflow-primary px-[18px] active:opacity-75 dark:bg-gymflow-primaryDark">
+          <ThemedText lightColor="#ffffff" darkColor="#002b36" className="font-bold">
             {mode === 'create' ? 'Create User' : 'Save Changes'}
           </ThemedText>
         </Pressable>
@@ -287,71 +293,3 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
     </View>
   );
 }
-
-/*
-const styles = StyleSheet.create({
-  actions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginTop: 8,
-  },
-  container: {
-    gap: 18,
-    width: '100%',
-  },
-  deleteButton: {
-    alignItems: 'center',
-    borderRadius: 8,
-    borderWidth: 1,
-    minHeight: 48,
-    justifyContent: 'center',
-    marginTop: 10,
-    paddingHorizontal: 18,
-  },
-  error: {
-    color: '#dc322f',
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  fieldGroup: {
-    gap: 8,
-  },
-  narrowFieldGroup: {
-    maxWidth: '50%',
-  },
-  input: {
-    borderRadius: 8,
-    borderWidth: 1,
-    fontSize: 16,
-    minHeight: 48,
-    paddingHorizontal: 14,
-  },
-  primaryButton: {
-    alignItems: 'center',
-    borderRadius: 8,
-    minHeight: 48,
-    justifyContent: 'center',
-    paddingHorizontal: 18,
-  },
-  primaryButtonText: {
-    fontWeight: '700',
-  },
-  pickerInput: {
-    alignItems: 'center',
-    borderRadius: 8,
-    borderWidth: 1,
-    fontSize: 16,
-    minHeight: 48,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  secondaryButton: {
-    alignItems: 'center',
-    borderRadius: 8,
-    borderWidth: 1,
-    minHeight: 48,
-    justifyContent: 'center',
-    paddingHorizontal: 18,
-  },
-});*/
