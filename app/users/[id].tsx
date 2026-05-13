@@ -1,28 +1,23 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { observer } from 'mobx-react-lite';
-import { Alert, Platform, StyleSheet, View } from 'react-native';
+import { Alert, Platform, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { UserForm } from '@/components/users/user-form';
-import { USER_SCREEN_MAX_WIDTH } from '@/constants/layout';
-import { Colors } from '@/constants/theme';
 import type { UserFormValues } from '@/state/schemas/user-schema';
-import { useResolvedColorScheme } from '@/state/context/theme-mode';
 import { useUsersStore } from '@/state/context/users-context';
 
 const EditUserScreen = observer(function EditUserScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const usersStore = useUsersStore();
-  const colorScheme = useResolvedColorScheme();
-  const palette = Colors[colorScheme];
   const user = id ? usersStore.findUser(id) : undefined;
 
   if (!user) {
     return (
-      <View style={[styles.screen, styles.centered, { backgroundColor: palette.background }]}>
+      <View className="flex-1 items-center justify-center bg-solarized-base3 p-5 dark:bg-solarized-base03">
         <ThemedText type="subtitle">User not found</ThemedText>
-        <ThemedText style={{ color: palette.mutedText }}>
+        <ThemedText className="text-solarized-base01 dark:text-solarized-base1">
           This profile may have already been removed.
         </ThemedText>
       </View>
@@ -57,8 +52,8 @@ const EditUserScreen = observer(function EditUserScreen() {
   }
 
   return (
-    <View style={[styles.screen, { backgroundColor: palette.background }]}>
-      <View style={styles.content}>
+    <View className="flex-1 bg-solarized-base3 dark:bg-solarized-base03">
+      <View className="w-full max-w-[860px] self-center gap-[22px] p-5">
         <ThemedText type="title">Edit User</ThemedText>
         <UserForm
           initialUser={existingUser}
@@ -73,21 +68,3 @@ const EditUserScreen = observer(function EditUserScreen() {
 });
 
 export default EditUserScreen;
-
-const styles = StyleSheet.create({
-  centered: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  content: {
-    alignSelf: 'center',
-    gap: 22,
-    maxWidth: USER_SCREEN_MAX_WIDTH,
-    padding: 20,
-    width: '100%',
-  },
-  screen: {
-    flex: 1,
-  },
-});

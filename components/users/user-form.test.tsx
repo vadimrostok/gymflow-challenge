@@ -39,6 +39,8 @@ describe('UserForm', () => {
   });
 
   it('renders form-level removal for existing users', () => {
+    const onDelete = jest.fn();
+
     renderWithTheme(
       <UserForm
         initialUser={{
@@ -51,11 +53,13 @@ describe('UserForm', () => {
         }}
         mode="edit"
         onCancel={jest.fn()}
-        onDelete={jest.fn()}
+        onDelete={onDelete}
         onSubmit={jest.fn()}
       />
     );
 
-    expect(screen.getByText('Remove User')).toBeTruthy();
+    fireEvent.press(screen.getByText('Remove User'));
+
+    expect(onDelete).toHaveBeenCalledTimes(1);
   });
 });

@@ -14,13 +14,13 @@ type UsersListProps = {
 
 export const UsersList = observer(function UsersList({ containerStyle, users, onDeleteUser }: UsersListProps) {
   return (
-    <View style={[styles.listWrapper, containerStyle]}>
+    <View className="w-full self-center" style={containerStyle}>
       <FlatList
         contentContainerStyle={users.length ? styles.listContent : styles.emptyContent}
         data={users}
         keyExtractor={(user) => user.id}
         ListEmptyComponent={
-          <View style={styles.emptyState}>
+          <View className="items-center gap-2">
             <ThemedText type="subtitle">No users yet</ThemedText>
             <ThemedText>Create the first staff or member profile to get started.</ThemedText>
           </View>
@@ -32,18 +32,10 @@ export const UsersList = observer(function UsersList({ containerStyle, users, on
 });
 
 const styles = StyleSheet.create({
-  listWrapper: {
-    width: '100%',
-    alignSelf: 'center',
-  },
   emptyContent: {
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
-  },
-  emptyState: {
-    alignItems: 'center',
-    gap: 8,
   },
   listContent: {
     gap: 12,

@@ -2,6 +2,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import '../global.css';
 
 import { ThemeModeButton } from '@/components/theme-mode-button';
 //import { RouteAwareBackButton } from '@/components/navigation/route-aware-back';

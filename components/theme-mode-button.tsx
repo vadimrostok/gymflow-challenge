@@ -1,7 +1,6 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Colors } from '@/constants/theme';
 import { useThemeMode } from '@/state/context/theme-mode';
 
 const themeModeLabels = {
@@ -16,31 +15,32 @@ const themeModeSymbols = {
 
 export function ThemeModeButton() {
   const { isAuto, resolvedColorScheme, setIsAuto, cycleThemeMode } = useThemeMode();
-  const palette = Colors[resolvedColorScheme];
 
   return (
-    <View style={styles.container}>
+    <View className="flex-row items-center gap-3">
       <Pressable
         accessibilityLabel="Auto theme"
         accessibilityRole="checkbox"
         accessibilityState={{ checked: isAuto }}
         onPress={() => setIsAuto(!isAuto)}
-        style={({ pressed }) => [styles.autoControl, { opacity: pressed ? 0.72 : 1 }]}>
+        className="min-h-10 flex-row items-center gap-1.5 active:opacity-70">
         <View
-          style={[
-            styles.checkbox,
-            {
-              backgroundColor: isAuto ? palette.primaryButtonBackground : palette.surface,
-              borderColor: isAuto ? palette.primaryButtonBackground : palette.border,
-            },
-          ]}>
+          className={
+            isAuto
+              ? 'h-[18px] w-[18px] items-center justify-center rounded border border-gymflow-primary bg-gymflow-primary dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark'
+              : 'h-[18px] w-[18px] items-center justify-center rounded border border-solarized-base1 bg-solarized-base2 dark:border-solarized-base01 dark:bg-solarized-base02'
+          }>
           {isAuto ? (
-            <ThemedText type="defaultSemiBold" style={[styles.checkmark, { color: palette.primaryButtonText }]}>
+            <ThemedText
+              type="defaultSemiBold"
+              lightColor="#ffffff"
+              darkColor="#002b36"
+              className="text-sm leading-4 text-white dark:text-solarized-base03">
               ✓
             </ThemedText>
           ) : null}
         </View>
-        <ThemedText type="defaultSemiBold" style={styles.autoLabel}>
+        <ThemedText type="defaultSemiBold" className="text-sm leading-[18px]">
           Auto
         </ThemedText>
       </Pressable>
@@ -50,60 +50,11 @@ export function ThemeModeButton() {
         accessibilityState={{ disabled: isAuto }}
         disabled={isAuto}
         onPress={cycleThemeMode}
-        style={({ pressed }) => [
-          styles.button,
-          {
-            backgroundColor: palette.surface,
-            borderColor: palette.border,
-            opacity: isAuto ? 0.46 : pressed ? 0.72 : 1,
-          },
-        ]}>
-        <ThemedText type="defaultSemiBold" style={styles.label}>
+        className="h-9 w-9 items-center justify-center rounded-full border border-solarized-base1 bg-solarized-base2 active:opacity-70 disabled:opacity-45 dark:border-solarized-base01 dark:bg-solarized-base02">
+        <ThemedText type="defaultSemiBold" className="text-[17px] leading-[21px]">
           {themeModeSymbols[resolvedColorScheme]}
         </ThemedText>
       </Pressable>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  autoControl: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 6,
-    minHeight: 40,
-  },
-  autoLabel: {
-    fontSize: 14,
-    lineHeight: 18,
-  },
-  button: {
-    alignItems: 'center',
-    borderRadius: 18,
-    borderWidth: 1,
-    height: 36,
-    justifyContent: 'center',
-    width: 36,
-  },
-  checkbox: {
-    alignItems: 'center',
-    borderRadius: 4,
-    borderWidth: 1,
-    height: 18,
-    justifyContent: 'center',
-    width: 18,
-  },
-  checkmark: {
-    fontSize: 14,
-    lineHeight: 16,
-  },
-  container: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 12,
-  },
-  label: {
-    fontSize: 17,
-    lineHeight: 21,
-  },
-});

@@ -2,13 +2,11 @@ import { useState } from 'react';
 
 import { MaterialIcons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { formatUserBirthday } from '@/components/users/format-user-birthday';
-import { Colors } from '@/constants/theme';
 import type { User } from '@/state/schemas/user-schema';
-import { useResolvedColorScheme } from '@/state/context/theme-mode';
 
 type UserListItemProps = {
   user: User;
@@ -17,25 +15,29 @@ type UserListItemProps = {
 
 export function UserListItem({ user, onDelete }: UserListItemProps) {
   const [isDeleteTooltipVisible, setIsDeleteTooltipVisible] = useState(false);
-  const colorScheme = useResolvedColorScheme();
-  const palette = Colors[colorScheme];
   const birthdayLabel = formatUserBirthday(user.dateOfBirth);
 
   return (
-    <View style={[styles.card, { backgroundColor: palette.surface, borderColor: palette.border }]}>
+    <View className="w-full flex-row gap-3 rounded-lg border border-white bg-solarized-base2 p-3.5 dark:bg-solarized-base02">
       <Link href={`/users/${user.id}`} asChild>
-        <Pressable accessibilityRole="link" style={styles.content}>
-          <View style={styles.nameRow}>
-            <ThemedText type="defaultSemiBold" style={styles.name}>
+        <Pressable accessibilityRole="link" className="flex-1 gap-1.5">
+          <View className="flex-row flex-wrap items-center gap-2">
+            <ThemedText type="defaultSemiBold" className="shrink leading-[22px]">
               {user.fullName}
             </ThemedText>
-            <View style={[styles.rolePill, { backgroundColor: palette.accentSoft }]}>
-              <ThemedText type="defaultSemiBold" style={[styles.roleText, { color: palette.accent }]}>
+            <View className="rounded-lg bg-[#f4e7b5] px-2.5 py-1 dark:bg-[#3a3f2c]">
+              <ThemedText
+                type="defaultSemiBold"
+                lightColor="#b58900"
+                darkColor="#b58900"
+                className="text-[13px] leading-4 text-solarized-yellow">
                 {user.role === 'STAFF' ? 'Staff' : 'Member'}
               </ThemedText>
             </View>
           </View>
-          <ThemedText style={{ color: palette.mutedText }}>{birthdayLabel}</ThemedText>
+          <ThemedText lightColor="#586e75" darkColor="#93a1a1">
+            {birthdayLabel}
+          </ThemedText>
         </Pressable>
       </Link>
       <Pressable
@@ -48,75 +50,19 @@ export function UserListItem({ user, onDelete }: UserListItemProps) {
         onFocus={() => setIsDeleteTooltipVisible(true)}
         onHoverIn={() => setIsDeleteTooltipVisible(true)}
         onHoverOut={() => setIsDeleteTooltipVisible(false)}
-        style={({ pressed }) => [
-          styles.deleteButton,
-          { backgroundColor: palette.danger, borderColor: palette.danger, opacity: pressed ? 0.72 : 1 },
-        ]}>
+        className="relative h-10 w-10 items-center justify-center self-center rounded-lg border border-solarized-red bg-solarized-red active:opacity-70">
         <MaterialIcons color="#ffffff" name="delete-outline" size={20} />
         {isDeleteTooltipVisible ? (
-          <View style={[styles.tooltip, { backgroundColor: palette.text }]}>
-            <ThemedText style={[styles.tooltipText, { color: palette.background }]}>delete user</ThemedText>
+          <View className="absolute bottom-[46px] right-0 w-[82px] rounded-md bg-solarized-base02 px-2 py-1.5 dark:bg-solarized-base2">
+            <ThemedText
+              lightColor="#fdf6e3"
+              darkColor="#002b36"
+              className="text-center text-xs leading-[14px]">
+              delete user
+            </ThemedText>
           </View>
         ) : null}
       </Pressable>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    width: '100%',
-    borderRadius: 8,
-    borderWidth: 1,
-    flexDirection: 'row',
-    gap: 12,
-    padding: 14,
-  },
-  content: {
-    flex: 1,
-    gap: 6,
-  },
-  deleteButton: {
-    alignItems: 'center',
-    alignSelf: 'center',
-    borderRadius: 8,
-    borderWidth: 1,
-    height: 40,
-    justifyContent: 'center',
-    position: 'relative',
-    width: 40,
-  },
-  name: {
-    flexShrink: 1,
-    lineHeight: 22,
-  },
-  nameRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  rolePill: {
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  roleText: {
-    fontSize: 13,
-    lineHeight: 16,
-  },
-  tooltip: {
-    borderRadius: 6,
-    bottom: 46,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    position: 'absolute',
-    right: 0,
-    width: 82,
-  },
-  tooltipText: {
-    fontSize: 12,
-    lineHeight: 14,
-    textAlign: 'center',
-  },
-});
