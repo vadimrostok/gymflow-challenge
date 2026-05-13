@@ -18,7 +18,9 @@ export const userFormSchema = z.object({
     .trim()
     .min(3, USER_FORM_ERROR_MESSAGES.fullNameMin)
     .max(50, USER_FORM_ERROR_MESSAGES.fullNameMax),
-  role: z.enum(userRoles, { message: USER_FORM_ERROR_MESSAGES.roleRequired }),
+  role: z
+    .enum(userRoles, { message: USER_FORM_ERROR_MESSAGES.roleRequired })
+    .refine((role) => userRoles.includes(role as UserRole), USER_FORM_ERROR_MESSAGES.roleRequired),
   dateOfBirth: z
     .string()
     .trim()

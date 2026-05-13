@@ -3,12 +3,15 @@ import { DateTime } from 'luxon';
 import { Controller, useForm } from 'react-hook-form';
 import { Pressable, TextInput, View } from 'react-native';
 import { useMemo, useRef } from 'react';
+import RNPickerSelect from 'react-native-picker-select';
 import DateTimePicker, { DateType, useDefaultStyles, useDefaultClassNames } from 'react-native-ui-datepicker';
+import { z } from 'zod';
 
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import {
   userFormSchema,
+  USER_FORM_ERROR_MESSAGES,
   userRoles,
   type User,
   type UserFormValues,
@@ -26,9 +29,39 @@ type UserFormProps = {
 
 const emptyUserFormValues: UserFormValues = {
   fullName: '',
-  role: 'MEMBER',
+  role: '' as UserRole, // Disabled for new users to showcase validation
   dateOfBirth: '',
 };
+
+function getDefaultDatePickerValue(value: string) {
+  return value || undefined;
+}
+
+function parseDatePickerValue(date: DateType) {
+  if (!date) {
+    return '';
+  }
+
+  if (typeof date === 'string') {
+    const parsedDate = DateTime.fromISO(date, { zone: 'utc' });
+
+    return parsedDate.isValid ? parsedDate.toISODate() ?? '' : date;
+  }
+
+  if (typeof date === 'number') {
+    return DateTime.fromMillis(date, { zone: 'utc' }).toISODate() ?? '';
+  }
+
+  if (date instanceof Date) {
+    return DateTime.fromJSDate(date, { zone: 'utc' }).toISODate() ?? '';
+  }
+
+  if (!('toDate' in date) || typeof date.toDate !== 'function') {
+    return '';
+  }
+
+  return DateTime.fromJSDate(date.toDate(), { zone: 'utc' }).toISODate() ?? '';
+}
 
 function toISODate(date: DateType) {
   if (!date) {
@@ -132,16 +165,37 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           control={control}
           name="role"
           render={({ field: { onChange, value } }) => (
-            <View className="flex-row flex-wrap gap-2.5">
-              {userRoles.map((role) => (
-                <RoleButton
-                  isSelected={value === role}
-                  key={role}
-                  onPress={() => onChange(role)}
-                  role={role}
-                />
-              ))}
-            </View>
+            <RNPickerSelect
+              items={userRoles.map((role) => ({
+                label: role === 'STAFF' ? 'Staff' : 'Member',
+                value: role,
+              }))}
+              onValueChange={(selectedRole) => {
+                onChange(selectedRole ?? '');
+              }}
+              placeholder={
+                mode === 'create'
+                  ? { label: 'Choose role', value: '', color: palette.mutedText }
+                  : {}
+              }
+              /*style={{
+                inputIOS: [
+                  styles.pickerInput,
+                  { color: palette.text, backgroundColor: palette.surface, borderColor: palette.border },
+                ],
+                inputAndroid: [
+                  styles.pickerInput,
+                  { color: palette.text, backgroundColor: palette.surface, borderColor: palette.border },
+                ],
+                inputWeb: [
+                  styles.pickerInput,
+                  { color: palette.text, backgroundColor: palette.surface, borderColor: palette.border },
+                ],
+                placeholder: { color: palette.mutedText, fontStyle: 'italic' },
+              }}*/
+              testID="role-picker"
+              value={value}
+            />
           )}
         />
         {errors.role ? (
@@ -160,9 +214,9 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
             <DateTimePicker
               className="rounded-lg border border-solarized-base1 bg-solarized-base2 p-3 dark:border-solarized-base01 dark:bg-solarized-base02"
               mode="single"
-              date={value}
+              date={getDefaultDatePickerValue(value)}
               timeZone="UTC"
-              onChange={({ date }) => onChange(toISODate(date))}
+              onChange={({ date }) => onChange(parseDatePickerValue(date))}
               styles={datePickerStyles}
               maxDate={now.current}
               classNames={{
@@ -200,9 +254,16 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
       <View className="mt-2 flex-row flex-wrap gap-3">
         <Pressable
           accessibilityRole="button"
-          onPress={handleSubmit(onSubmit)}
-          className="min-h-12 items-center justify-center rounded-lg bg-gymflow-primary px-[18px] active:opacity-75 dark:bg-gymflow-primaryDark">
-          <ThemedText lightColor="#ffffff" darkColor="#002b36" className="font-bold">
+          onPress={handleSubmit((values) => onSubmit({ ...values, role: values.role as UserRole }))}
+          className="min-h-12 items-center justify-center rounded-lg bg-gymflow-primary px-[18px] active:opacity-75 dark:bg-gymflow-primaryDark"
+          /*style={({ pressed }) => [
+            styles.primaryButton,
+            { backgroundColor: palette.primaryButtonBackground, opacity: pressed ? 0.74 : 1 },
+          ]}>*/
+        >
+          <ThemedText
+            /*style={[styles.primaryButtonText, { color: palette.primaryButtonText }]}*/
+            lightColor="#ffffff" darkColor="#002b36" className="font-bold">
             {mode === 'create' ? 'Create User' : 'Save Changes'}
           </ThemedText>
         </Pressable>
@@ -227,29 +288,70 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
   );
 }
 
-type RoleButtonProps = {
-  isSelected: boolean;
-  onPress: () => void;
-  role: UserRole;
-};
-
-function RoleButton({ isSelected, onPress, role }: RoleButtonProps) {
-  const colorScheme = useResolvedColorScheme();
-  const palette = Colors[colorScheme];
-  const buttonClassName = isSelected
-    ? 'min-h-11 min-w-[120px] flex-1 items-center justify-center rounded-lg border border-solarized-blue bg-solarized-blue px-3.5 active:opacity-75 dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark'
-    : 'min-h-11 min-w-[120px] flex-1 items-center justify-center rounded-lg border border-solarized-base1 bg-solarized-base2 px-3.5 active:opacity-75 dark:border-solarized-base01 dark:bg-solarized-base02';
-
-  return (
-    <Pressable
-      accessibilityLabel={role === 'STAFF' ? 'Staff' : 'Member'}
-      accessibilityRole="button"
-      accessibilityState={{ selected: isSelected }}
-      onPress={onPress}
-      className={buttonClassName}>
-      <ThemedText type="defaultSemiBold" style={{ color: isSelected ? palette.onTint : palette.text }}>
-        {role === 'STAFF' ? 'Staff' : 'Member'}
-      </ThemedText>
-    </Pressable>
-  );
-}
+/*
+const styles = StyleSheet.create({
+  actions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 8,
+  },
+  container: {
+    gap: 18,
+    width: '100%',
+  },
+  deleteButton: {
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth: 1,
+    minHeight: 48,
+    justifyContent: 'center',
+    marginTop: 10,
+    paddingHorizontal: 18,
+  },
+  error: {
+    color: '#dc322f',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  fieldGroup: {
+    gap: 8,
+  },
+  narrowFieldGroup: {
+    maxWidth: '50%',
+  },
+  input: {
+    borderRadius: 8,
+    borderWidth: 1,
+    fontSize: 16,
+    minHeight: 48,
+    paddingHorizontal: 14,
+  },
+  primaryButton: {
+    alignItems: 'center',
+    borderRadius: 8,
+    minHeight: 48,
+    justifyContent: 'center',
+    paddingHorizontal: 18,
+  },
+  primaryButtonText: {
+    fontWeight: '700',
+  },
+  pickerInput: {
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth: 1,
+    fontSize: 16,
+    minHeight: 48,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  secondaryButton: {
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth: 1,
+    minHeight: 48,
+    justifyContent: 'center',
+    paddingHorizontal: 18,
+  },
+});*/
