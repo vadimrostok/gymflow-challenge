@@ -1,10 +1,7 @@
 import { SQLiteStorage } from 'expo-sqlite/kv-store';
 
-import {
-  parsePreferences,
-  preferencesKey,
-  type AppPreferencesStorage,
-} from '@/state/storage/preferences-storage';
+import { AppPreferencesStorage } from '@/state/storage/preferences-types';
+import { parsePreferences, preferencesKey } from '@/state/storage/preferences-utils';
 
 const sqlitePreferencesStorage = new SQLiteStorage('gymflow-preferences.db');
 

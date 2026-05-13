@@ -143,3 +143,6 @@
 + datepicker (npm install react-native-ui-datepicker)
 - user list item, increase clickable area
 + use nativewind (totally forgot)
+
+# iteration 4
+- a lot of hardcoded colors, use constants

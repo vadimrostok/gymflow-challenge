@@ -4,9 +4,8 @@ import { useColorScheme as useNativeWindColorScheme } from 'nativewind';
 
 import {
   preferencesStorage,
-  type AppPreferences,
-  type AppPreferencesStorage,
 } from '@/state/storage/preferences-storage';
+import type { AppPreferences, AppPreferencesStorage } from '@/state/storage/preferences-types';
 
 export type ThemeAutoModeOn = boolean;
 export type ThemeMode = 'light' | 'dark';

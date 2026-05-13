@@ -1,4 +1,4 @@
-import type { AppPreferences, AppPreferencesStorage } from '@/state/storage/preferences-storage';
+import type { AppPreferences, AppPreferencesStorage } from '@/state/storage/preferences-types';
 
 export function createPreferencesStorage(): AppPreferencesStorage {
   let preferences: AppPreferences | undefined;

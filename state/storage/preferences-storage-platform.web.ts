@@ -1,8 +1,5 @@
-import {
-  parsePreferences,
-  preferencesKey,
-  type AppPreferencesStorage,
-} from '@/state/storage/preferences-storage';
+import { AppPreferencesStorage } from '@/state/storage/preferences-types';
+import { parsePreferences, preferencesKey } from '@/state/storage/preferences-utils';
 
 export function createPreferencesStorage(): AppPreferencesStorage {
   return {
