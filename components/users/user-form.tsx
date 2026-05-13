@@ -79,6 +79,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
   const defaultDatePickerStyles = useDefaultStyles();
   const defaultClassNames = useDefaultClassNames();
   const datePickerEmphasisColor = colorScheme === 'dark' ? palette.accent : '#6c71c4';
+  const datePickerSelectorBackground = colorScheme === 'dark' ? '#002f3b' : '#e2dcc9';
   const formBorderColor = colorScheme === 'dark' ? '#31565f' : '#ffffff';
   const datePickerStyles = useMemo(
     () => ({
@@ -90,6 +91,13 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
       month_label: {
         color: palette.text,
         fontWeight: '600',
+      },
+      month_selector: {
+        backgroundColor: datePickerSelectorBackground,
+        borderRadius: 8,
+        marginRight: 8,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
       },
       month_selector_label: {
         color: datePickerEmphasisColor,
@@ -129,13 +137,19 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
         color: palette.text,
         fontWeight: '600',
       },
+      year_selector: {
+        backgroundColor: datePickerSelectorBackground,
+        borderRadius: 8,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+      },
       year_selector_label: {
         color: datePickerEmphasisColor,
         fontSize: 17,
         fontWeight: '700',
       },
     }),
-    [datePickerEmphasisColor, defaultDatePickerStyles, palette]
+    [datePickerEmphasisColor, datePickerSelectorBackground, defaultDatePickerStyles, palette]
   );
   const pickerStyles = useMemo<PickerStyle>(() => {
     const pickerInput = {
@@ -263,6 +277,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
                 disabled: 'opacity-40',
                 disabled_label: 'text-solarized-base1 dark:text-solarized-base01',
                 month_label: 'font-semibold',
+                month_selector: 'mr-2 rounded-lg bg-[#e2dcc9] px-2.5 py-1 dark:bg-[#002f3b]',
                 month_selector_label: 'text-xl font-bold',
                 outside_label: 'text-solarized-base1 dark:text-solarized-base01',
                 selected: 'border-gymflow-primary bg-gymflow-primary dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark',
@@ -275,6 +290,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
                 today_label: 'text-solarized-yellow',
                 weekday_label: 'text-sm uppercase text-solarized-base01 dark:text-solarized-base1',
                 year_label: 'font-semibold',
+                year_selector: 'rounded-lg bg-[#e2dcc9] px-2.5 py-1 dark:bg-[#002f3b]',
                 year_selector_label: 'text-xl font-bold',
                 active_year_label: 'font-semibold',
               }}
