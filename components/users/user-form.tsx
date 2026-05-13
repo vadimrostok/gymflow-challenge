@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useRef, useState } from 'react';
+import DateTimePicker, { DateType, useDefaultStyles, useDefaultClassNames } from 'react-native-ui-datepicker';
 
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
@@ -38,6 +40,11 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
     defaultValues: initialUser ?? emptyUserFormValues,
     resolver: zodResolver(userFormSchema),
   });
+
+  const now = useRef<Date>(new Date());
+  const datePickerStyles = useDefaultStyles();
+  const defaultClassNames = useDefaultClassNames();
+  const [selected, setSelected] = useState<DateType>();
 
   return (
     <View style={styles.container}>
@@ -86,24 +93,26 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
         {errors.role ? <ThemedText style={styles.error}>{errors.role.message}</ThemedText> : null}
       </View>
 
-      <View style={styles.fieldGroup}>
+      <View style={styles.narrowFieldGroup}>
         <ThemedText type="defaultSemiBold">Date of Birthday</ThemedText>
         <Controller
           control={control}
           name="dateOfBirth"
-          render={({ field: { onBlur, onChange, value } }) => (
-            <TextInput
-              accessibilityLabel="Date of Birthday"
-              inputMode="numeric"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={palette.mutedText}
-              style={[
-                styles.input,
-                { borderColor: palette.border, color: palette.text, backgroundColor: palette.surface },
-              ]}
-              value={value}
+          render={({ field: { onChange, value } }) => (
+            <DateTimePicker
+              mode="single"
+              date={value}
+              timeZone="UTC"
+              onChange={({ date }) =>  onChange(date)}
+              styles={datePickerStyles}
+              maxDate={now.current}
+              classNames={{
+                today: 'border-amber-500', // Add a border to today's date
+                selected: 'bg-amber-500 border-amber-500', // Highlight the selected day
+                selected_label: "text-white", // Highlight the selected day label
+                day: `${defaultClassNames.day} hover:bg-amber-100`, // Change background color on hover
+                disabled: 'opacity-50', // Make disabled dates appear more faded
+              }}
             />
           )}
         />
@@ -118,9 +127,9 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           onPress={handleSubmit(onSubmit)}
           style={({ pressed }) => [
             styles.primaryButton,
-            { backgroundColor: palette.tint, opacity: pressed ? 0.74 : 1 },
+            { backgroundColor: palette.primaryButtonBackground, opacity: pressed ? 0.74 : 1 },
           ]}>
-          <ThemedText style={[styles.primaryButtonText, { color: palette.onTint }]}>
+          <ThemedText style={[styles.primaryButtonText, { color: palette.primaryButtonText }]}>
             {mode === 'create' ? 'Create User' : 'Save Changes'}
           </ThemedText>
         </Pressable>
@@ -210,6 +219,9 @@ const styles = StyleSheet.create({
   },
   fieldGroup: {
     gap: 8,
+  },
+  narrowFieldGroup: {
+    maxWidth: '50%',
   },
   input: {
     borderRadius: 8,

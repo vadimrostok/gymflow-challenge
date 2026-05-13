@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { Alert, Platform, Pressable, StyleSheet, View } from 'react-native';
 
@@ -11,6 +11,7 @@ import { useResolvedColorScheme } from '@/state/context/theme-mode';
 import { useUsersStore } from '@/state/context/users-context';
 
 const UsersScreen = observer(function UsersScreen() {
+  const router = useRouter();
   const usersStore = useUsersStore();
   const colorScheme = useResolvedColorScheme();
   const palette = Colors[colorScheme];
@@ -42,18 +43,17 @@ const UsersScreen = observer(function UsersScreen() {
               Manage staff and member profiles across mobile and web.
             </ThemedText>
           </View>
-          <Link href="/users/new" asChild>
-            <Pressable
-              accessibilityRole="button"
-              style={({ pressed }) => [
-                styles.addButton,
-                { backgroundColor: palette.tint, opacity: pressed ? 0.74 : 1 },
-              ]}>
-              <ThemedText type="defaultSemiBold" style={{ color: palette.onTint }}>
-                Add User
-              </ThemedText>
-            </Pressable>
-          </Link>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push('/users/new')}
+            style={({ pressed }) => [
+              styles.addButton,
+              { backgroundColor: palette.primaryButtonBackground, opacity: pressed ? 0.74 : 1 },
+            ]}>
+            <ThemedText type="defaultSemiBold" style={{ color: palette.primaryButtonText }}>
+              Add User
+            </ThemedText>
+          </Pressable>
         </View>
         <UsersList
           containerStyle={{ maxWidth: USER_SCREEN_MAX_WIDTH }}
@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 20,
     paddingBottom: 0,
+    width: '100%',
   },
   headerText: {
     flex: 1,
@@ -91,7 +92,10 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: 'center',
+    alignSelf: 'center',
+    maxWidth: USER_SCREEN_MAX_WIDTH,
     paddingHorizontal: 20,
+    width: '100%',
   },
   screen: {
     flex: 1,

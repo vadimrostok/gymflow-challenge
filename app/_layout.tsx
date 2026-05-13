@@ -33,13 +33,16 @@ function RootLayoutContent() {
       <Stack
         screenOptions={{
           contentStyle: { backgroundColor: palette.background },
+          headerLeftContainerStyle: styles.headerLeft,
           headerRight: () => <ThemeModeButton />,
+          headerRightContainerStyle: styles.headerRight,
           headerShadowVisible: false,
           headerStyle: { backgroundColor: palette.background },
+          headerTitleStyle: styles.headerTitle,
           headerTintColor: palette.text,
         }}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="users/index" options={{ title: 'Users' }} />
+        <Stack.Screen name="users/index" options={{ title: 'Home' }} />
         <Stack.Screen
           name="users/new"
           options={{ headerBackTitle: 'Users', title: 'New User' }}
@@ -53,3 +56,16 @@ function RootLayoutContent() {
     </ThemeProvider>
   );
 }
+
+const styles = {
+  headerLeft: {
+    paddingLeft: 24,
+  },
+  headerRight: {
+    paddingRight: 24,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+  },
+};

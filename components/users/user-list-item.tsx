@@ -1,8 +1,11 @@
+import { useState } from 'react';
+
+import { MaterialIcons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
-import { DateTime } from 'luxon';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { formatUserBirthday } from '@/components/users/format-user-birthday';
 import { Colors } from '@/constants/theme';
 import type { User } from '@/state/schemas/user-schema';
 import { useResolvedColorScheme } from '@/state/context/theme-mode';
@@ -13,11 +16,10 @@ type UserListItemProps = {
 };
 
 export function UserListItem({ user, onDelete }: UserListItemProps) {
+  const [isDeleteTooltipVisible, setIsDeleteTooltipVisible] = useState(false);
   const colorScheme = useResolvedColorScheme();
   const palette = Colors[colorScheme];
-  const birthdayLabel = user.dateOfBirth
-    ? DateTime.fromISO(user.dateOfBirth).toLocaleString(DateTime.DATE_MED)
-    : 'No birthday set';
+  const birthdayLabel = formatUserBirthday(user.dateOfBirth);
 
   return (
     <View style={[styles.card, { backgroundColor: palette.surface, borderColor: palette.border }]}>
@@ -38,15 +40,24 @@ export function UserListItem({ user, onDelete }: UserListItemProps) {
       </Link>
       <Pressable
         accessibilityLabel={`Remove ${user.fullName}`}
+        accessibilityHint="Delete user"
         accessibilityRole="button"
+        hitSlop={6}
+        onBlur={() => setIsDeleteTooltipVisible(false)}
         onPress={onDelete}
+        onFocus={() => setIsDeleteTooltipVisible(true)}
+        onHoverIn={() => setIsDeleteTooltipVisible(true)}
+        onHoverOut={() => setIsDeleteTooltipVisible(false)}
         style={({ pressed }) => [
           styles.deleteButton,
-          { borderColor: palette.danger, opacity: pressed ? 0.72 : 1 },
+          { backgroundColor: palette.danger, borderColor: palette.danger, opacity: pressed ? 0.72 : 1 },
         ]}>
-        <ThemedText type="defaultSemiBold" style={{ color: palette.danger }}>
-          Remove
-        </ThemedText>
+        <MaterialIcons color="#ffffff" name="delete-outline" size={20} />
+        {isDeleteTooltipVisible ? (
+          <View style={[styles.tooltip, { backgroundColor: palette.text }]}>
+            <ThemedText style={[styles.tooltipText, { color: palette.background }]}>delete user</ThemedText>
+          </View>
+        ) : null}
       </Pressable>
     </View>
   );
@@ -70,12 +81,13 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderRadius: 8,
     borderWidth: 1,
+    height: 40,
     justifyContent: 'center',
-    minHeight: 40,
-    paddingHorizontal: 12,
+    position: 'relative',
+    width: 40,
   },
   name: {
-    flex: 1,
+    flexShrink: 1,
     lineHeight: 22,
   },
   nameRow: {
@@ -92,5 +104,19 @@ const styles = StyleSheet.create({
   roleText: {
     fontSize: 13,
     lineHeight: 16,
+  },
+  tooltip: {
+    borderRadius: 6,
+    bottom: 46,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    position: 'absolute',
+    right: 0,
+    width: 82,
+  },
+  tooltipText: {
+    fontSize: 12,
+    lineHeight: 14,
+    textAlign: 'center',
   },
 });

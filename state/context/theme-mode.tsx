@@ -5,6 +5,7 @@ export type ThemeAutoModeOn = boolean;
 export type ThemeMode = 'light' | 'dark';
 
 type ThemeModeContextValue = {
+  isAuto: ThemeAutoModeOn;
   setIsAuto: (isAuto: ThemeAutoModeOn) => void;
   resolvedColorScheme: ThemeMode;
   cycleThemeMode: () => void;
@@ -24,6 +25,7 @@ export function ThemeModeProvider({ children }: PropsWithChildren) {
 
   const themeContext = useMemo(
     () => ({
+      isAuto,
       resolvedColorScheme,
       setIsAuto,
       cycleThemeMode: (): void => {
@@ -34,7 +36,7 @@ export function ThemeModeProvider({ children }: PropsWithChildren) {
         )
       },
     }),
-    [resolvedColorScheme]
+    [isAuto, resolvedColorScheme]
   );
 
   return <ThemeModeContext.Provider value={themeContext}>{children}</ThemeModeContext.Provider>;
