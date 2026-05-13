@@ -2,6 +2,12 @@ import { createContext, useContext, useEffect, useMemo, useState, type PropsWith
 import { useColorScheme as useNativeColorScheme } from 'react-native';
 import { useColorScheme as useNativeWindColorScheme } from 'nativewind';
 
+import {
+  preferencesStorage,
+  type AppPreferences,
+  type AppPreferencesStorage,
+} from '@/state/storage/preferences-storage';
+
 export type ThemeAutoModeOn = boolean;
 export type ThemeMode = 'light' | 'dark';
 
@@ -15,11 +21,28 @@ type ThemeModeContextValue = {
 const themeModeCycle: ThemeMode[] = ['light', 'dark'] as const;
 const ThemeModeContext = createContext<ThemeModeContextValue | null>(null);
 
-export function ThemeModeProvider({ children }: PropsWithChildren) {
+function readStoredPreferences(storage: AppPreferencesStorage): AppPreferences | undefined {
+  try {
+    return storage.getPreferences();
+  } catch {
+    return undefined;
+  }
+}
+
+type ThemeModeProviderProps = PropsWithChildren<{
+  storage?: AppPreferencesStorage;
+}>;
+
+export function ThemeModeProvider({
+  children,
+  storage = preferencesStorage,
+}: ThemeModeProviderProps) {
+  const storedPreferences = useMemo(() => readStoredPreferences(storage), [storage]);
+  const storedThemePreferences = storedPreferences?.theme;
   const systemColorScheme = useNativeColorScheme();
   const { setColorScheme } = useNativeWindColorScheme();
-  const [isAuto, setIsAuto] = useState<ThemeAutoModeOn>(false);
-  const [mode, setMode] = useState<ThemeMode>(themeModeCycle[0]);
+  const [isAuto, setIsAuto] = useState<ThemeAutoModeOn>(storedThemePreferences?.isAuto ?? false);
+  const [mode, setMode] = useState<ThemeMode>(storedThemePreferences?.mode ?? themeModeCycle[0]);
   const resolvedColorScheme: ThemeMode = useMemo<ThemeMode>(
     (): ThemeMode => isAuto ? (systemColorScheme ?? themeModeCycle[0]) : mode,
     [isAuto, mode, systemColorScheme]
@@ -43,11 +66,19 @@ export function ThemeModeProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     try {
-      setColorScheme(isAuto ? 'system' : mode);
+      setColorScheme(resolvedColorScheme);
     } catch {
       // NativeWind's generated dark-mode flag is unavailable in the Jest renderer.
     }
-  }, [isAuto, mode, setColorScheme]);
+  }, [resolvedColorScheme, setColorScheme]);
+
+  useEffect(() => {
+    try {
+      storage.setPreferences({ theme: { isAuto, mode } });
+    } catch {
+      // Preferences are nice-to-have; theme switching itself should still work if storage fails.
+    }
+  }, [isAuto, mode, storage]);
 
   return <ThemeModeContext.Provider value={themeContext}>{children}</ThemeModeContext.Provider>;
 }

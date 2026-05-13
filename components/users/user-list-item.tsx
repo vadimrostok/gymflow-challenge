@@ -29,9 +29,9 @@ export function UserListItem({ user, onDelete }: UserListItemProps) {
           <Pressable accessibilityRole="link" className="min-h-14 flex-1 justify-center gap-1.5">
             <View className="flex-row flex-wrap items-center gap-2">
               <ThemedText
-                type="defaultSemiBold"
-                className="shrink leading-[22px]"
-                style={{ fontFamily: FontFamily.reciaBold }}>
+              type="defaultSemiBold"
+              className="shrink leading-[22px]"
+              style={{ fontFamily: FontFamily.bold }}>
                 {user.fullName}
               </ThemedText>
               <View className="rounded-lg bg-[#f4e7b5] px-2.5 py-1 dark:bg-[#3a3f2c]">
@@ -40,7 +40,7 @@ export function UserListItem({ user, onDelete }: UserListItemProps) {
                   lightColor="#b58900"
                   darkColor="#b58900"
                   className="text-[13px] leading-4 text-solarized-yellow"
-                  style={{ fontFamily: FontFamily.reciaItalic }}>
+                  style={{ fontFamily: FontFamily.italic }}>
                   {user.role === 'STAFF' ? 'Staff' : 'Member'}
                 </ThemedText>
               </View>

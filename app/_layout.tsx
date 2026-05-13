@@ -8,7 +8,7 @@ import '../global.css';
 
 import { HeaderActions } from '@/components/header-actions';
 //import { RouteAwareBackButton } from '@/components/navigation/route-aware-back';
-import { FontFamily, reciaFontAssets } from '@/constants/fonts';
+import { FontFamily, fontAssets } from '@/constants/fonts';
 import { Colors } from '@/constants/theme';
 import { ThemeModeProvider, useResolvedColorScheme } from '@/state/context/theme-mode';
 import { StoresProvider } from '@/state/context/users-context';
@@ -19,7 +19,7 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  const [areFontsLoaded] = useFonts(reciaFontAssets);
+  const [areFontsLoaded] = useFonts(fontAssets);
 
   if (!areFontsLoaded) {
     return null;
@@ -75,7 +75,7 @@ const styles = {
     paddingRight: 16,
   },
   headerTitle: {
-    fontFamily: FontFamily.reciaBold,
+    fontFamily: FontFamily.bold,
     fontSize: 18,
     fontWeight: '700' as const,
   },

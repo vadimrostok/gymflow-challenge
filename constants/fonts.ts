@@ -1,13 +1,13 @@
 export const FontFamily = {
-  reciaRegular: 'Recia-Regular',
-  reciaSemibold: 'Recia-Semibold',
-  reciaBold: 'Recia-Bold',
-  reciaItalic: 'Recia-Italic',
+  regular: 'Rubik-Regular',
+  semibold: 'Rubik-SemiBold',
+  bold: 'Rubik-Bold',
+  italic: 'Rubik-Italic',
 } as const;
 
-export const reciaFontAssets = {
-  [FontFamily.reciaRegular]: require('../assets/fonts/Recia_Complete/Fonts/OTF/Recia-Regular.otf'),
-  [FontFamily.reciaSemibold]: require('../assets/fonts/Recia_Complete/Fonts/OTF/Recia-Semibold.otf'),
-  [FontFamily.reciaBold]: require('../assets/fonts/Recia_Complete/Fonts/OTF/Recia-Bold.otf'),
-  [FontFamily.reciaItalic]: require('../assets/fonts/Recia_Complete/Fonts/OTF/Recia-Italic.otf'),
+export const fontAssets = {
+  [FontFamily.regular]: require('../assets/fonts/Rubik/static/Rubik-Regular.ttf'),
+  [FontFamily.semibold]: require('../assets/fonts/Rubik/static/Rubik-SemiBold.ttf'),
+  [FontFamily.bold]: require('../assets/fonts/Rubik/static/Rubik-Bold.ttf'),
+  [FontFamily.italic]: require('../assets/fonts/Rubik/static/Rubik-Italic.ttf'),
 } as const;

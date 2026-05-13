@@ -36,29 +36,29 @@ export function ThemedText({
 
 const styles = StyleSheet.create({
   default: {
-    fontFamily: FontFamily.reciaRegular,
+    fontFamily: FontFamily.regular,
     fontSize: 16,
     lineHeight: 24,
   },
   defaultSemiBold: {
-    fontFamily: FontFamily.reciaSemibold,
+    fontFamily: FontFamily.semibold,
     fontSize: 16,
     lineHeight: 24,
     fontWeight: '600',
   },
   title: {
-    fontFamily: FontFamily.reciaBold,
+    fontFamily: FontFamily.bold,
     fontSize: 32,
     fontWeight: 'bold',
     lineHeight: 32,
   },
   subtitle: {
-    fontFamily: FontFamily.reciaBold,
+    fontFamily: FontFamily.bold,
     fontSize: 20,
     fontWeight: 'bold',
   },
   link: {
-    fontFamily: FontFamily.reciaRegular,
+    fontFamily: FontFamily.regular,
     fontSize: 16,
     lineHeight: 30,
     color: '#0a7ea4',
