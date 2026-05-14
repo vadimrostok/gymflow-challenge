@@ -85,7 +85,18 @@ function RootLayoutContent() {
               name="users/[id]"
               options={{ headerBackTitle: 'Users', title: 'Edit User' }}
             />
-            <Stack.Screen name="settings" options={{ headerBackTitle: 'Users', title: 'Settings' }} />
+            <Stack.Screen
+              name="settings"
+              options={{
+                headerBackTitle: 'Users',
+                headerRight: () => (
+                  <View style={styles.headerRight}>
+                    <HeaderActions hideSettings />
+                  </View>
+                ),
+                title: 'Settings',
+              }}
+            />
           </Stack>
         </View>
         <AppFooter />
@@ -97,19 +108,19 @@ function RootLayoutContent() {
 
 const styles = {
   headerLeftButton: {
-    marginLeft: 16,
-    minHeight: 44,
-    minWidth: 44,
+    height: 44,
+    marginLeft: 8,
+    width: 44,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
   },
   headerRight: {
-    paddingRight: 32,
+    paddingRight: 8,
   },
   headerTitle: {
     fontFamily: FontFamily.bold,
     fontSize: 18,
     fontWeight: '700' as const,
-    marginLeft: 16,
+    marginLeft: 0,
   },
 };

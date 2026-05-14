@@ -14,7 +14,12 @@ describe('UserForm', () => {
     fireEvent.changeText(screen.getByLabelText('Full Name'), 'Maya Angelou');
     fireEvent(screen.getByTestId('role-picker'), 'onValueChange', 'STAFF');
     fireEvent.changeText(screen.getByLabelText('Date of Birthday'), '1928-04-04');
-    fireEvent.press(screen.getByText('Create User'));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Create User').props.accessibilityState.disabled).toBe(false);
+    });
+
+    fireEvent.press(screen.getByLabelText('Create User'));
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(
@@ -27,15 +32,14 @@ describe('UserForm', () => {
     });
   });
 
-  it('shows validation errors and only renders Remove User in edit mode', async () => {
+  it('disables invalid create submit and only renders Remove User in edit mode', async () => {
     renderWithTheme(<UserForm mode="create" onCancel={jest.fn()} onSubmit={jest.fn()} />);
 
     expect(screen.queryByText('Remove User')).toBeNull();
 
-    fireEvent.press(screen.getByText('Create User'));
-
-    expect(await screen.findByText('Full name must be at least 3 characters.')).toBeTruthy();
-    expect(await screen.findByText('Choose Staff or Member role.')).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByLabelText('Create User').props.accessibilityState.disabled).toBe(true);
+    });
   });
 
   it('renders form-level removal for existing users', () => {

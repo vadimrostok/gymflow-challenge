@@ -25,17 +25,26 @@ jest.doMock('react-native-ui-datepicker', () => ({
   useDefaultStyles: () => ({}),
 }));
 
-jest.doMock('react-native-picker-select', () => ({
-  __esModule: true,
-  default: ({ onValueChange, pickerProps, testID, value }) => {
-    const React = require('react');
-    const { TextInput } = require('react-native');
+jest.doMock('@react-native-picker/picker', () => {
+  const React = require('react');
+  const { TextInput } = require('react-native');
 
-    return React.createElement(TextInput, {
-      accessibilityLabel: 'Role',
-      onValueChange,
-      testID: testID ?? pickerProps?.testID,
-      value,
-    });
-  },
-}));
+  function Picker({ children, onValueChange, selectedValue, testID }) {
+    return React.createElement(
+      TextInput,
+      {
+        accessibilityLabel: 'Role',
+        onValueChange,
+        testID,
+        value: selectedValue,
+      },
+      children
+    );
+  }
+
+  Picker.Item = ({ label }) => React.createElement(React.Fragment, null, label);
+
+  return {
+    Picker,
+  };
+});

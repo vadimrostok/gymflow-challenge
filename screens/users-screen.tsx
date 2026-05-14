@@ -74,6 +74,7 @@ export const UsersScreen = observer(function UsersScreen() {
         </View>
         <UsersList
           containerStyle={{ maxWidth: USER_SCREEN_MAX_WIDTH }}
+          isLoading={usersStore.isLoadingUsers}
           onDeleteUser={requestDeleteUser}
           users={usersStore.sortedUsers}
         />
@@ -89,6 +90,7 @@ export const UsersScreen = observer(function UsersScreen() {
         <ScrollView
           className="flex-1"
           contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}>
           {content}
         </ScrollView>

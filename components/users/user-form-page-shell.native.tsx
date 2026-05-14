@@ -107,6 +107,8 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
         justifyContent: 'space-between',
         paddingBottom: isImageVisible ? collapsedHeaderHeight : 0,
       }}
+      keyboardDismissMode="interactive"
+      keyboardShouldPersistTaps="always"
       onScroll={scrollHandler}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}>
@@ -117,8 +119,13 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', width: '100%' }}>
         {isImageVisible && painting ? (
-          <AnimatedView style={{ height: expandedHeaderHeight, overflow: 'hidden', width: '100%' }}>
+          <AnimatedView
+            pointerEvents="none"
+            testID="parallax-image-hitbox"
+            style={{ height: expandedHeaderHeight, overflow: 'hidden', width: '100%' }}>
             <AnimatedView
+              pointerEvents="none"
+              testID="parallax-image-layer"
               style={[
                 {
                   height: expandedHeaderHeight,
@@ -138,6 +145,8 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
               />
               <View
                 className="bg-solarized-base03/25"
+                pointerEvents="none"
+                testID="parallax-image-overlay"
                 style={{ bottom: 0, left: 0, position: 'absolute', right: 0, top: 0 }}
               />
             </AnimatedView>

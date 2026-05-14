@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import { DateTime } from 'luxon';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { cssInterop } from 'nativewind';
-import { Pressable, TextInput, useWindowDimensions, View } from 'react-native';
-import { useMemo, useRef } from 'react';
-import RNPickerSelect, { type PickerStyle } from 'react-native-picker-select';
+import { Modal, Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native';
+import { useMemo, useRef, useState } from 'react';
 import DateTimePicker, {
   type CalendarDay,
   type CalendarMonth,
@@ -41,12 +41,70 @@ type UserFormProps = {
   onCancel: () => void;
   onDelete?: () => void;
 };
+type RolePickerProps = {
+  colorScheme: 'light' | 'dark';
+  mode: UserFormProps['mode'];
+  onChange: (role: UserRole | '') => void;
+  palette: (typeof Colors)['light'];
+  rolePickerStyles: ReturnType<typeof createRolePickerStyles>;
+  value: UserRole | '';
+};
 
 const emptyUserFormValues: UserFormValues = {
   fullName: '',
   role: '' as UserRole, // Disabled for new users to showcase validation
   dateOfBirth: '',
 };
+const nativePickerContentPointerEvents = Platform.OS === 'web' ? undefined : ('none' as const);
+
+function createRolePickerStyles(palette: (typeof Colors)['light'], formBorderColor: string) {
+  const container = {
+    backgroundColor: palette.surface,
+    borderColor: formBorderColor,
+    borderRadius: 8,
+    borderWidth: 1,
+    minHeight: 48,
+    overflow: 'hidden' as const,
+    width: '100%' as const,
+  };
+  const picker = {
+    backgroundColor: 'transparent',
+    color: palette.text,
+    fontSize: 16,
+    minHeight: 48,
+    paddingHorizontal: Platform.OS === 'web' ? 14 : 8,
+    width: '100%' as const,
+  };
+  const compactInput = {
+    alignItems: 'center' as const,
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    minHeight: 48,
+    paddingHorizontal: 14,
+  };
+  const modalBackdrop = {
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    flex: 1,
+    justifyContent: 'flex-end' as const,
+  };
+  const modalSheet = {
+    backgroundColor: palette.surface,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingBottom: 24,
+  };
+  const modalActions = {
+    alignItems: 'center' as const,
+    borderBottomColor: formBorderColor,
+    borderBottomWidth: 1,
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    minHeight: 48,
+    paddingHorizontal: 16,
+  };
+
+  return { compactInput, container, modalActions, modalBackdrop, modalSheet, picker };
+}
 
 function getDefaultDatePickerValue(value: string) {
   return value || undefined;
@@ -88,7 +146,8 @@ function DatePickerDay({ day }: { day: CalendarDay }) {
         day.isSelected
           ? 'bg-gymflow-primary hover:bg-gymflow-primary dark:bg-gymflow-primaryDark dark:hover:bg-gymflow-primaryDark'
           : '',
-      ].join(' ')}>
+      ].join(' ')}
+      pointerEvents={nativePickerContentPointerEvents}>
       <ThemedText
         type={day.isSelected ? 'defaultSemiBold' : 'default'}
         lightColor={day.isSelected ? '#ffffff' : undefined}
@@ -108,7 +167,8 @@ function DatePickerMonth({ month }: { month: CalendarMonth }) {
         month.isSelected
           ? 'bg-gymflow-primary hover:bg-gymflow-primary dark:bg-gymflow-primaryDark dark:hover:bg-gymflow-primaryDark'
           : '',
-      ].join(' ')}>
+      ].join(' ')}
+      pointerEvents={nativePickerContentPointerEvents}>
       <ThemedText
         type={month.isSelected ? 'defaultSemiBold' : 'default'}
         lightColor={month.isSelected ? '#ffffff' : undefined}
@@ -129,13 +189,107 @@ function DatePickerYear({ year }: { year: CalendarYear }) {
         year.isSelected
           ? 'bg-gymflow-primary hover:bg-gymflow-primary dark:bg-gymflow-primaryDark dark:hover:bg-gymflow-primaryDark'
           : '',
-      ].join(' ')}>
+      ].join(' ')}
+      pointerEvents={nativePickerContentPointerEvents}>
       <ThemedText
         type={year.isSelected || year.isActivated ? 'defaultSemiBold' : 'default'}
         lightColor={year.isSelected ? '#ffffff' : undefined}
         darkColor={year.isSelected ? '#002b36' : undefined}>
         {year.text}
       </ThemedText>
+    </View>
+  );
+}
+
+function RolePicker({
+  colorScheme,
+  mode,
+  onChange,
+  palette,
+  rolePickerStyles,
+  value,
+}: RolePickerProps) {
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const selectedRoleLabel =
+    userRoleOptions.find((option) => option.value === value)?.label ??
+    (mode === 'create' ? 'Choose role' : '');
+
+  if (Platform.OS === 'ios') {
+    return (
+      <>
+        <Pressable
+          accessibilityLabel="Role"
+          accessibilityRole="button"
+          onPress={() => setIsPickerOpen(true)}
+          style={[rolePickerStyles.container, rolePickerStyles.compactInput]}
+          testID="role-picker">
+          <ThemedText
+            lightColor={value ? palette.text : palette.mutedText}
+            darkColor={value ? palette.text : palette.mutedText}>
+            {selectedRoleLabel}
+          </ThemedText>
+          <MaterialIcons color={palette.mutedText} name="keyboard-arrow-down" size={22} />
+        </Pressable>
+        <Modal animationType="slide" transparent visible={isPickerOpen}>
+          <Pressable style={rolePickerStyles.modalBackdrop} onPress={() => setIsPickerOpen(false)}>
+            <Pressable style={rolePickerStyles.modalSheet}>
+              <View style={rolePickerStyles.modalActions}>
+                <Pressable onPress={() => setIsPickerOpen(false)}>
+                  <ThemedText type="defaultSemiBold">Cancel</ThemedText>
+                </Pressable>
+                <Pressable onPress={() => setIsPickerOpen(false)}>
+                  <ThemedText type="defaultSemiBold" lightColor={palette.accent} darkColor={palette.accent}>
+                    Done
+                  </ThemedText>
+                </Pressable>
+              </View>
+              <Picker
+                accessibilityLabel="Role"
+                itemStyle={{ color: palette.text, fontSize: 18 }}
+                onValueChange={(selectedRole) => onChange(selectedRole as UserRole | '')}
+                selectedValue={value}
+                selectionColor={palette.primaryButtonBackground}
+                style={rolePickerStyles.picker}
+                testID="role-picker-modal">
+                {mode === 'create' ? (
+                  <Picker.Item color={palette.mutedText} label="Choose role" value="" />
+                ) : null}
+                {userRoleOptions.map((option) => (
+                  <Picker.Item
+                    color={colorScheme === 'dark' ? palette.text : undefined}
+                    key={option.value}
+                    label={option.label}
+                    value={option.value}
+                  />
+                ))}
+              </Picker>
+            </Pressable>
+          </Pressable>
+        </Modal>
+      </>
+    );
+  }
+
+  return (
+    <View style={rolePickerStyles.container}>
+      <Picker
+        accessibilityLabel="Role"
+        dropdownIconColor={palette.mutedText}
+        itemStyle={{ color: palette.text, fontSize: 16 }}
+        mode="dropdown"
+        onValueChange={(selectedRole) => onChange(selectedRole as UserRole | '')}
+        prompt="Role"
+        selectedValue={value}
+        selectionColor={palette.primaryButtonBackground}
+        style={rolePickerStyles.picker}
+        testID="role-picker">
+        {mode === 'create' ? (
+          <Picker.Item color={palette.mutedText} label="Choose role" value="" />
+        ) : null}
+        {userRoleOptions.map((option) => (
+          <Picker.Item color={palette.text} key={option.value} label={option.label} value={option.value} />
+        ))}
+      </Picker>
     </View>
   );
 }
@@ -148,12 +302,14 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<UserFormValues>({
     defaultValues: initialUser ?? emptyUserFormValues,
     resolver: zodResolver(userFormSchema),
   });
   const fullNameValue = useWatch({ control, name: 'fullName' });
+  const roleValue = useWatch({ control, name: 'role' });
+  const dateOfBirthValue = useWatch({ control, name: 'dateOfBirth' });
   const isFullNameWide = (fullNameValue?.length ?? 0) > 42;
   const halfFieldStyle = isWideLayout ? { maxWidth: '50%' as const } : undefined;
   const fullNameFieldStyle = isWideLayout && !isFullNameWide ? halfFieldStyle : undefined;
@@ -246,43 +402,16 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
     }),
     []
   );
-  const pickerStyles = useMemo<PickerStyle>(() => {
-    const pickerInput = {
-      backgroundColor: palette.surface,
-      borderColor: formBorderColor,
-      borderRadius: 8,
-      borderWidth: 1,
-      color: palette.text,
-      fontSize: 16,
-      minHeight: 48,
-      paddingHorizontal: 14,
-      paddingRight: 48,
-      paddingVertical: 12,
-      width: '100%',
-    };
-
-    return {
-      viewContainer: {
-        alignSelf: 'stretch',
-        width: '100%',
-      },
-      inputIOS: pickerInput,
-      inputAndroid: pickerInput,
-      inputWeb: {
-        ...pickerInput,
-        appearance: 'none',
-        outlineColor: palette.primaryButtonBackground,
-      } as typeof pickerInput,
-      placeholder: {
-        color: palette.mutedText,
-      },
-      iconContainer: {
-        pointerEvents: 'none' as const,
-        right: 14,
-        top: 13,
-      },
-    };
-  }, [formBorderColor, palette]);
+  const isFormValid = userFormSchema.safeParse({
+    fullName: fullNameValue,
+    role: roleValue,
+    dateOfBirth: dateOfBirthValue,
+  }).success;
+  const isSubmitDisabled = !isFormValid || isSubmitting;
+  const rolePickerStyles = useMemo(
+    () => createRolePickerStyles(palette, formBorderColor),
+    [formBorderColor, palette]
+  );
 
   return (
     <View className="w-full gap-6">
@@ -318,6 +447,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           control={control}
           name="role"
           render={({ field: { onChange, value } }) => (
+<<<<<<< HEAD
             <RNPickerSelect
               Icon={() => <MaterialIcons color={palette.mutedText} name="keyboard-arrow-down" size={22} />}
               items={userRoleOptions}
@@ -333,6 +463,14 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
               style={pickerStyles}
               touchableWrapperProps={{ testID: 'role-picker' }}
               useNativeAndroidPickerStyle={false}
+=======
+            <RolePicker
+              colorScheme={colorScheme}
+              mode={mode}
+              onChange={onChange}
+              palette={palette}
+              rolePickerStyles={rolePickerStyles}
+>>>>>>> main
               value={value}
             />
           )}
@@ -395,10 +533,19 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
 
       <View className="mt-2 flex-row flex-wrap gap-3">
         <Pressable
+<<<<<<< HEAD
           testID={mode === 'create' ? 'users-form-submit-create' : 'users-form-submit-save'}
+=======
+          accessibilityLabel={mode === 'create' ? 'Create User' : 'Save Changes'}
+>>>>>>> main
           accessibilityRole="button"
+          accessibilityState={{ disabled: isSubmitDisabled }}
+          disabled={isSubmitDisabled}
           onPress={handleSubmit((values) => onSubmit({ ...values, role: values.role as UserRole }))}
-          className="min-h-12 items-center justify-center rounded-lg bg-gymflow-primary px-[18px] hover:bg-[#276f4b] active:opacity-75 dark:bg-gymflow-primaryDark dark:hover:bg-[#52c98d]">
+          className={[
+            'min-h-12 items-center justify-center rounded-lg bg-gymflow-primary px-[18px] hover:bg-[#276f4b] active:opacity-75 dark:bg-gymflow-primaryDark dark:hover:bg-[#52c98d]',
+            isSubmitDisabled ? 'opacity-45' : '',
+          ].join(' ')}>
           <ThemedText lightColor="#ffffff" darkColor="#002b36" className="font-bold">
             {mode === 'create' ? 'Create User' : 'Save Changes'}
           </ThemedText>
