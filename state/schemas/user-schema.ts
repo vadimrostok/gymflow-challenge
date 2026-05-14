@@ -54,5 +54,5 @@ export function createTimestamp() {
 }
 
 export function createLocalUserId() {
-  return `local-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  return `${Date.now() * 1000 + Math.floor(Math.random() * 1000)}`;
 }
