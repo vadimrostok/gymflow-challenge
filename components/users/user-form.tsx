@@ -4,6 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { DateTime } from 'luxon';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { cssInterop } from 'nativewind';
+import * as clsx from 'clsx';
 import {
   Keyboard,
   Modal,
@@ -454,7 +455,14 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
               placeholder="Jane Smith"
               placeholderTextColor={palette.mutedText}
               returnKeyType="done"
-              className="min-h-12 rounded-lg border border-white bg-solarized-base2 px-3.5 text-base text-solarized-base02 dark:border-[#31565f] dark:bg-solarized-base02 dark:text-solarized-base2"
+              className={
+                clsx.clsx(
+                  'min-h-12 rounded-lg border border-white bg-solarized-base2 px-3.5 text-xl'
+                  + ' text-solarized-base02 dark:border-[#31565f] dark:bg-solarized-base02 dark:text-solarized-base2', {
+                  'text-lg': Platform.OS === 'web',
+                  'text-xl': Platform.OS !== 'web',
+                  'pb-2': Platform.OS !== 'web',
+                })}
               value={value}
             />
           )}

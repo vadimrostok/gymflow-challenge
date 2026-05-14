@@ -55,7 +55,7 @@ function RootLayoutContent() {
                       styles.headerLeftButton,
                       { opacity: pressed ? 0.7 : 1 },
                     ]}>
-                    <MaterialIcons color={palette.text} name="arrow-back" size={28} />
+                    <MaterialIcons style={{ marginLeft: 4 }} color={palette.text} name="arrow-back" size={28} />
                   </Pressable>
                 ) : null,
               headerRight: () => (
@@ -64,13 +64,16 @@ function RootLayoutContent() {
                 </View>
               ),
               headerShadowVisible: false,
-              headerStyle: { backgroundColor: palette.background, ...webColorTransition },
+              headerStyle: {
+                backgroundColor: palette.background,
+                ...webColorTransition,
+              },
               headerTitle: ({ children, tintColor }) => (
                 <Text
                   style={[
                     styles.headerTitle,
                     { color: tintColor ?? palette.text },
-                    webColorTransition,
+                    webColorTransition
                   ]}>
                   {children}
                 </Text>
@@ -118,7 +121,8 @@ const styles = {
     justifyContent: 'center' as const,
   },
   headerRight: {
-    paddingRight: 8,
+    paddingRight: 0,
+    backgroundColor: 'transparent',
   },
   headerTitle: {
     fontFamily: FontFamily.bold,
