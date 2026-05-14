@@ -14,6 +14,7 @@ export function HeaderActions() {
   return (
     <View className="flex-row items-center gap-3">
       <Pressable
+        testID="settings-button"
         accessibilityLabel="Settings"
         accessibilityRole="button"
         onPress={navigation.toSettings}

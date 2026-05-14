@@ -28,6 +28,7 @@ export function ThemeModeButton() {
   return (
     <View className="flex-row items-center gap-3">
       <Pressable
+        testID="theme-auto-toggle"
         accessibilityLabel="Auto theme"
         accessibilityRole="checkbox"
         accessibilityState={{ checked: isAuto }}
@@ -55,6 +56,7 @@ export function ThemeModeButton() {
         </ThemedText>
       </Pressable>
       <Pressable
+        testID="theme-mode-toggle"
         accessibilityLabel={themeModeLabels[resolvedColorScheme]}
         accessibilityRole="button"
         accessibilityState={{ disabled: isAuto }}

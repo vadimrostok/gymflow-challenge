@@ -48,6 +48,7 @@ function RootLayoutContent() {
               headerLeft: ({ canGoBack }) =>
                 canGoBack ? (
                   <Pressable
+                    testID="app-header-back"
                     accessibilityLabel="Back"
                     accessibilityRole="button"
                     onPress={() => router.back()}

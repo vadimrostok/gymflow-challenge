@@ -99,6 +99,7 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
 
   return (
     <AnimatedScrollView
+      testID="user-form-scroll"
       ref={scrollRef}
       className="flex-1"
       contentContainerStyle={{

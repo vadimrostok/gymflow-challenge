@@ -68,12 +68,14 @@ export function DeleteUserDialog({
                   </View>
                   <View className="flex-row flex-wrap justify-end gap-3">
                     <Pressable
+                      testID="delete-user-dialog-cancel"
                       accessibilityRole="button"
                       onPress={onCancel}
                       className="min-h-11 items-center justify-center rounded-lg border border-solarized-base1 px-4 hover:bg-[#e2dcc9] active:opacity-75 dark:border-solarized-base01 dark:hover:bg-[#0b4350]">
                       <ThemedText type="defaultSemiBold">Cancel</ThemedText>
                     </Pressable>
                     <Pressable
+                      testID="delete-user-dialog-confirm"
                       accessibilityRole="button"
                       onPress={onConfirm}
                       className="min-h-11 items-center justify-center rounded-lg bg-solarized-red px-4 hover:bg-[#b91c1c] active:opacity-75">

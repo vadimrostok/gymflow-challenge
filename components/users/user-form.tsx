@@ -293,6 +293,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           name="fullName"
           render={({ field: { onBlur, onChange, value } }) => (
             <TextInput
+              testID="full-name-input"
               accessibilityLabel="Full Name"
               autoCapitalize="words"
               onBlur={onBlur}
@@ -328,8 +329,9 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
                   ? { label: 'Choose role', value: '', color: palette.mutedText }
                   : {}
               }
-              pickerProps={{ testID: 'role-picker' }}
+              pickerProps={{ testID: 'role-picker-native' }}
               style={pickerStyles}
+              touchableWrapperProps={{ testID: 'role-picker' }}
               useNativeAndroidPickerStyle={false}
               value={value}
             />
@@ -393,6 +395,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
 
       <View className="mt-2 flex-row flex-wrap gap-3">
         <Pressable
+          testID={mode === 'create' ? 'users-form-submit-create' : 'users-form-submit-save'}
           accessibilityRole="button"
           onPress={handleSubmit((values) => onSubmit({ ...values, role: values.role as UserRole }))}
           className="min-h-12 items-center justify-center rounded-lg bg-gymflow-primary px-[18px] hover:bg-[#276f4b] active:opacity-75 dark:bg-gymflow-primaryDark dark:hover:bg-[#52c98d]">
@@ -401,6 +404,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           </ThemedText>
         </Pressable>
         <Pressable
+          testID="users-form-cancel"
           accessibilityRole="button"
           onPress={onCancel}
           className="min-h-12 items-center justify-center rounded-lg border border-solarized-base1 px-[18px] hover:bg-[#e2dcc9] active:opacity-75 dark:border-solarized-base01 dark:hover:bg-[#0b4350]">
@@ -408,6 +412,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
         </Pressable>
         {mode === 'edit' && onDelete ? (
           <Pressable
+            testID="users-form-delete"
             accessibilityRole="button"
             onPress={onDelete}
             className="min-h-12 flex-row items-center justify-center gap-2 rounded-lg bg-solarized-red px-[18px] hover:bg-[#b91c1c] active:opacity-75">

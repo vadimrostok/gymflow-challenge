@@ -41,6 +41,8 @@ export function UserListItem({ user, isLast = false, showDeleteButton, onDelete 
       style={{ overflow: 'visible' }}>
       <View className="relative w-full rounded-lg">
         <Pressable
+          testID={`user-list-row-${user.id}`}
+          accessibilityLabel={`Open ${user.fullName} profile`}
           accessibilityRole="link"
           onPress={() => navigation.toEditUser(user.id)}
           className="min-h-[86px] w-full justify-center gap-1.5 rounded-lg border border-white bg-solarized-base2 py-3.5 pl-3.5 pr-[70px] transition-colors duration-500 active:opacity-80 dark:border-[#31565f] dark:bg-solarized-base02">
@@ -68,6 +70,7 @@ export function UserListItem({ user, isLast = false, showDeleteButton, onDelete 
         </Pressable>
         {showDeleteButton && (
           <Pressable
+            testID={`delete-user-${user.id}`}
             accessibilityLabel={`Remove ${user.fullName}`}
             accessibilityHint="Delete user"
             accessibilityRole="button"

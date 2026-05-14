@@ -55,6 +55,7 @@ export const UsersScreen = observer(function UsersScreen() {
             </ThemedText>
           </View>
           <Pressable
+            testID="users-add-button"
             accessibilityLabel="Add User"
             accessibilityRole="button"
             onPress={navigation.toNewUser}

@@ -6,6 +6,7 @@ import { useThemeMode } from '@/state/context/theme-mode';
 import { preferencesStorage } from '@/state/storage/preferences-storage';
 
 type SettingsCheckboxProps = {
+  testID: string;
   isEnabled: boolean;
   enabledSetStateFn: (changeFn: (currentIsEnabled: boolean) => boolean) => void;
   accessibilityLabel: string;
@@ -13,9 +14,10 @@ type SettingsCheckboxProps = {
   description: string;
 }
 const SettingsCheckbox = (
-  { isEnabled, enabledSetStateFn, accessibilityLabel, label, description } : SettingsCheckboxProps
+  { testID, isEnabled, enabledSetStateFn, accessibilityLabel, label, description } : SettingsCheckboxProps
 ): ReactElement => (
   <Pressable
+    testID={testID}
     accessibilityLabel={accessibilityLabel}
     accessibilityRole="checkbox"
     accessibilityState={{ checked: isEnabled }}
@@ -75,6 +77,7 @@ export function SettingsScreen(): ReactElement {
         </View>
 
         {Platform.OS !== 'web' && <SettingsCheckbox
+          testID="settings-secure-mode-toggle"
           isEnabled={isSecureModeEnabled}
           enabledSetStateFn={setIsSecureModeEnabled}
           accessibilityLabel="Secure mode"
@@ -83,6 +86,7 @@ export function SettingsScreen(): ReactElement {
         />}
 
         <SettingsCheckbox
+          testID="users-list-delete-toggle"
           isEnabled={showUsersListDeleteButton}
           enabledSetStateFn={setShowUsersListDeleteButton}
           accessibilityLabel="Show delete button on users list"
