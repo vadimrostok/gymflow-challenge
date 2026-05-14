@@ -88,6 +88,7 @@ export const UsersScreen = observer(function UsersScreen() {
         <ScrollView
           className="flex-1"
           contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}>
           {content}
         </ScrollView>

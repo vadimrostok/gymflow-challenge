@@ -106,6 +106,8 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
         justifyContent: 'space-between',
         paddingBottom: isImageVisible ? collapsedHeaderHeight : 0,
       }}
+      keyboardDismissMode="interactive"
+      keyboardShouldPersistTaps="always"
       onScroll={scrollHandler}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}>
