@@ -13,13 +13,20 @@ import { useAppNavigation } from '@/navigation/use-app-navigation';
 import { useScreenFocusEffect } from '@/navigation/use-screen-focus-effect';
 import { useUsersStore } from '@/state/context/users-context';
 import type { User } from '@/state/schemas/user-schema';
+import { preferencesStorage } from '@/state/storage/preferences-storage';
 
 export const UsersScreen = observer(function UsersScreen() {
   const navigation = useAppNavigation();
   const usersStore = useUsersStore();
   const [pendingDeleteUser, setPendingDeleteUser] = useState<User | undefined>();
+  const [showUsersListDeleteButton, setShowUsersListDeleteButton] = useState(
+    preferencesStorage.getPreferences()?.showUsersListDeleteButton ?? false
+  );
 
   useScreenFocusEffect(() => {
+    setShowUsersListDeleteButton(
+      preferencesStorage.getPreferences()?.showUsersListDeleteButton ?? false
+    );
     void usersStore.loadUsers();
   });
 
@@ -55,6 +62,7 @@ export const UsersScreen = observer(function UsersScreen() {
             </ThemedText>
           </View>
           <Pressable
+            testID="users-add-button"
             accessibilityLabel="Add User"
             accessibilityRole="button"
             onPress={navigation.toNewUser}
@@ -75,6 +83,7 @@ export const UsersScreen = observer(function UsersScreen() {
           containerStyle={{ maxWidth: USER_SCREEN_MAX_WIDTH }}
           isLoading={usersStore.isLoadingUsers}
           onDeleteUser={requestDeleteUser}
+          showDeleteButton={showUsersListDeleteButton}
           users={usersStore.sortedUsers}
         />
       </View>

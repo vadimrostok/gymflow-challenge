@@ -10,13 +10,13 @@ import { Colors } from '@/constants/theme';
 import { useResolvedColorScheme } from '@/state/context/theme-mode';
 import { UserListItem } from '@/components/users/user-list-item';
 import type { User } from '@/state/schemas/user-schema';
-import { preferencesStorage } from '@/state/storage/preferences-storage';
 
 type UsersListProps = {
   users: User[];
   containerStyle?: ViewStyle;
   isLoading?: boolean;
   onDeleteUser: (user: User) => void;
+  showDeleteButton: boolean;
 };
 
 function UsersLoadingSpinner() {
@@ -61,10 +61,10 @@ function UsersLoadingSpinner() {
 export const UsersList = observer(function UsersList({
   containerStyle,
   isLoading = false,
+  showDeleteButton,
   users,
   onDeleteUser,
 }: UsersListProps) {
-  const preferences = preferencesStorage.getPreferences();
   return (
     <View className="w-full self-center" style={containerStyle}>
       <View className={users.length ? 'p-5' : 'flex-grow justify-center p-5'}>
@@ -78,7 +78,7 @@ export const UsersList = observer(function UsersList({
                 key={user.id}
                 onDelete={() => onDeleteUser(user)}
                 user={user}
-                showDeleteButton={preferences?.showUsersListDeleteButton ?? false}
+                showDeleteButton={showDeleteButton}
               />
             ))}
           </AnimatePresence>

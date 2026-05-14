@@ -9,7 +9,14 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest --watchAll=false",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "e2e:web": "npm run web",
+    "e2e:ios:build": "detox build --configuration ios.sim.debug",
+    "e2e:ios": "npm run e2e:ios:build && detox test --configuration ios.sim.debug --cleanup",
+    "e2e:android": "detox test --configuration android.emu.debug --cleanup",
+    "e2e:full": "npm run e2e:web && npm run e2e:mobile",
+    "e2e:mobile": "npm run e2e:ios && npm run e2e:android",
+    "e2e:mobile:watch": "npm run e2e:ios:build && detox test --configuration ios.sim.debug -- --watch --runInBand"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",

@@ -16,10 +16,10 @@ import {
   View,
 } from 'react-native';
 import { useMemo, useRef, useState } from 'react';
+import { scheduleOnRN } from 'react-native-worklets';
 import Animated, {
   Easing,
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -270,7 +270,7 @@ function RolePicker({
       },
       (finished) => {
         if (finished) {
-          runOnJS(setIsPickerMounted)(false);
+          scheduleOnRN(setIsPickerMounted, false);
         }
       }
     );
@@ -302,10 +302,10 @@ function RolePicker({
               onStartShouldSetResponder={() => true}
               style={[rolePickerStyles.modalSheet, sheetStyle]}>
               <View style={rolePickerStyles.modalActions}>
-                <Pressable onPress={closePicker}>
+                <Pressable onPress={closePicker} testID="role-picker-cancel">
                   <ThemedText type="defaultSemiBold">Cancel</ThemedText>
                 </Pressable>
-                <Pressable onPress={closePicker}>
+                <Pressable onPress={closePicker} testID="role-picker-done">
                   <ThemedText
                     type="defaultSemiBold"
                     lightColor={palette.accent}
@@ -496,6 +496,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           name="fullName"
           render={({ field: { onBlur, onChange, value } }) => (
             <TextInput
+              testID="full-name-input"
               accessibilityLabel="Full Name"
               autoCapitalize="words"
               onBlur={onBlur}
@@ -600,6 +601,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
 
       <View className="mt-2 flex-row flex-wrap gap-3">
         <Pressable
+          testID={mode === 'create' ? 'users-form-submit-create' : 'users-form-submit-save'}
           accessibilityLabel={mode === 'create' ? 'Create User' : 'Save Changes'}
           accessibilityRole="button"
           accessibilityState={{ disabled: isSubmitDisabled }}
@@ -614,6 +616,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           </ThemedText>
         </Pressable>
         <Pressable
+          testID="users-form-cancel"
           accessibilityRole="button"
           onPress={onCancel}
           className="min-h-12 items-center justify-center rounded-lg border border-solarized-base1 px-[18px] hover:bg-[#e2dcc9] active:opacity-75 dark:border-solarized-base01 dark:hover:bg-[#0b4350]">
@@ -621,6 +624,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
         </Pressable>
         {mode === 'edit' && onDelete ? (
           <Pressable
+            testID="users-form-delete"
             accessibilityRole="button"
             onPress={onDelete}
             className="min-h-12 flex-row items-center justify-center gap-2 rounded-lg bg-solarized-red px-[18px] hover:bg-[#b91c1c] active:opacity-75">
