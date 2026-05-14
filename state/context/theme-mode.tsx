@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
-import { useColorScheme as useNativeColorScheme } from 'react-native';
+import { Appearance, Platform, useColorScheme as useNativeColorScheme } from 'react-native';
 import { useColorScheme as useNativeWindColorScheme } from 'nativewind';
+import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 
 import {
   preferencesStorage,
@@ -41,10 +41,13 @@ export function ThemeModeProvider({
   const systemColorScheme = useNativeColorScheme();
   const { setColorScheme } = useNativeWindColorScheme();
   const [isAuto, setIsAuto] = useState<ThemeAutoModeOn>(storedThemePreferences?.isAuto ?? false);
-  const [mode, setMode] = useState<ThemeMode>(storedThemePreferences?.mode ?? themeModeCycle[0]);
+  const [storedMode, setStoredMode] = useState<ThemeMode>(storedThemePreferences?.mode ?? themeModeCycle[0]);
   const resolvedColorScheme: ThemeMode = useMemo<ThemeMode>(
-    (): ThemeMode => isAuto ? (systemColorScheme ?? themeModeCycle[0]) : mode,
-    [isAuto, mode, systemColorScheme]
+    (): ThemeMode =>
+      isAuto
+        ? systemColorScheme ?? Appearance.getColorScheme() ?? themeModeCycle[0]
+        : storedMode,
+    [isAuto, storedMode, systemColorScheme]
   );
 
   const themeContext = useMemo(
@@ -53,7 +56,7 @@ export function ThemeModeProvider({
       resolvedColorScheme,
       setIsAuto,
       cycleThemeMode: (): void => {
-        setMode(
+        setStoredMode(
           (currentMode: ThemeMode): ThemeMode =>
             themeModeCycle[themeModeCycle.indexOf(currentMode) + 1]
             ?? themeModeCycle[0]
@@ -65,19 +68,19 @@ export function ThemeModeProvider({
 
   useEffect(() => {
     try {
-      setColorScheme(resolvedColorScheme);
+      setColorScheme(isAuto && Platform.OS !== 'web' ? 'system' : resolvedColorScheme);
     } catch {
       // NativeWind's generated dark-mode flag is unavailable in the Jest renderer.
     }
-  }, [resolvedColorScheme, setColorScheme]);
+  }, [isAuto, resolvedColorScheme, setColorScheme]);
 
   useEffect(() => {
     try {
-      storage.setPreferences({ theme: { isAuto, mode } });
+      storage.setPreferences({ theme: { isAuto, mode: storedMode } });
     } catch {
       // Preferences are nice-to-have; theme switching itself should still work if storage fails.
     }
-  }, [isAuto, mode, storage]);
+  }, [isAuto, storedMode, storage]);
 
   return <ThemeModeContext.Provider value={themeContext}>{children}</ThemeModeContext.Provider>;
 }
