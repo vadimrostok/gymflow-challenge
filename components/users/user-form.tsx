@@ -4,7 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { DateTime } from 'luxon';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { cssInterop } from 'nativewind';
-import { Modal, Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native';
+import { Keyboard, Modal, Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native';
 import { useMemo, useRef, useState } from 'react';
 import DateTimePicker, {
   type CalendarDay,
@@ -220,7 +220,10 @@ function RolePicker({
         <Pressable
           accessibilityLabel="Role"
           accessibilityRole="button"
-          onPress={() => setIsPickerOpen(true)}
+          onPress={() => {
+            Keyboard.dismiss();
+            setIsPickerOpen(true);
+          }}
           style={[rolePickerStyles.container, rolePickerStyles.compactInput]}
           testID="role-picker">
           <ThemedText
@@ -234,10 +237,10 @@ function RolePicker({
           <Pressable style={rolePickerStyles.modalBackdrop} onPress={() => setIsPickerOpen(false)}>
             <Pressable style={rolePickerStyles.modalSheet}>
               <View style={rolePickerStyles.modalActions}>
-                <Pressable onPress={() => setIsPickerOpen(false)}>
+                <Pressable onPress={() => setIsPickerOpen(false)} testID="role-picker-cancel">
                   <ThemedText type="defaultSemiBold">Cancel</ThemedText>
                 </Pressable>
-                <Pressable onPress={() => setIsPickerOpen(false)}>
+                <Pressable onPress={() => setIsPickerOpen(false)} testID="role-picker-done">
                   <ThemedText type="defaultSemiBold" lightColor={palette.accent} darkColor={palette.accent}>
                     Done
                   </ThemedText>
@@ -402,12 +405,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
     }),
     []
   );
-  const isFormValid = userFormSchema.safeParse({
-    fullName: fullNameValue,
-    role: roleValue,
-    dateOfBirth: dateOfBirthValue,
-  }).success;
-  const isSubmitDisabled = !isFormValid || isSubmitting;
+  const isSubmitDisabled = isSubmitting;
   const rolePickerStyles = useMemo(
     () => createRolePickerStyles(palette, formBorderColor),
     [formBorderColor, palette]
@@ -447,30 +445,12 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           control={control}
           name="role"
           render={({ field: { onChange, value } }) => (
-<<<<<<< HEAD
-            <RNPickerSelect
-              Icon={() => <MaterialIcons color={palette.mutedText} name="keyboard-arrow-down" size={22} />}
-              items={userRoleOptions}
-              onValueChange={(selectedRole) => {
-                onChange(selectedRole ?? '');
-              }}
-              placeholder={
-                mode === 'create'
-                  ? { label: 'Choose role', value: '', color: palette.mutedText }
-                  : {}
-              }
-              pickerProps={{ testID: 'role-picker-native' }}
-              style={pickerStyles}
-              touchableWrapperProps={{ testID: 'role-picker' }}
-              useNativeAndroidPickerStyle={false}
-=======
             <RolePicker
               colorScheme={colorScheme}
               mode={mode}
               onChange={onChange}
               palette={palette}
               rolePickerStyles={rolePickerStyles}
->>>>>>> main
               value={value}
             />
           )}
@@ -533,11 +513,8 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
 
       <View className="mt-2 flex-row flex-wrap gap-3">
         <Pressable
-<<<<<<< HEAD
           testID={mode === 'create' ? 'users-form-submit-create' : 'users-form-submit-save'}
-=======
           accessibilityLabel={mode === 'create' ? 'Create User' : 'Save Changes'}
->>>>>>> main
           accessibilityRole="button"
           accessibilityState={{ disabled: isSubmitDisabled }}
           disabled={isSubmitDisabled}

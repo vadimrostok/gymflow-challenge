@@ -1,4 +1,5 @@
-const { by, device, element, expect, waitFor } = require('detox');
+const assert = require('node:assert/strict');
+const { by, device, element, expect: detoxExpect, waitFor } = require('detox');
 
 const now = Date.now();
 const userName = `E2E Full Flow ${now}`;
@@ -13,15 +14,13 @@ async function pickRole(role) {
   await element(by.id('role-picker')).tap();
 
   if (device.getPlatform() === 'ios') {
+    await waitFor(element(by.id('role-picker-done'))).toBeVisible().withTimeout(2500);
     try {
-      await waitFor(element(by.id('ios_picker'))).toBeVisible().withTimeout(1000);
+      await element(by.id('role-picker-modal')).setColumnToValue(0, role);
     } catch (_error) {
-      await element(by.id('role-picker')).tap();
+      await element(by.text(role)).atIndex(0).tap();
     }
-
-    await waitFor(element(by.id('ios_picker'))).toBeVisible().withTimeout(2500);
-    await element(by.id('ios_picker')).setColumnToValue(0, role);
-    await element(by.id('done_button')).tap();
+    await element(by.id('role-picker-done')).tap();
     return;
   }
 
@@ -77,7 +76,7 @@ describe('Gymflow users lifecycle flow', () => {
     await waitFor(element(by.text('Full name must be at least 3 characters.'))).toBeVisible().withTimeout(5000);
 
     await tapFormButton('users-form-cancel');
-    await expect(element(by.text(userName))).not.toExist();
+    await detoxExpect(element(by.text(userName))).not.toExist();
 
     // Create valid user
     await element(by.id('users-add-button')).tap();
@@ -85,7 +84,7 @@ describe('Gymflow users lifecycle flow', () => {
     await pickRole('Staff');
     await tapFormButton('users-form-submit-create');
 
-    await expect(element(by.text(userName))).toBeVisible();
+    await detoxExpect(element(by.text(userName))).toBeVisible();
 
     // Edit existing user (invalid save first, then valid)
     await element(by.text(userName)).tap();
@@ -98,10 +97,10 @@ describe('Gymflow users lifecycle flow', () => {
     await element(by.id('full-name-input')).replaceText(updatedUserName);
     await tapFormButton('users-form-submit-save');
 
-    await expect(element(by.text(updatedUserName))).toBeVisible();
+    await detoxExpect(element(by.text(updatedUserName))).toBeVisible();
 
     // Confirm delete button not available before settings toggle
-    await expect(element(by.label(`Remove ${updatedUserName}`))).not.toExist();
+    await detoxExpect(element(by.label(`Remove ${updatedUserName}`))).not.toExist();
 
     // Theme button emoji sanity checks
     const themeButton = element(by.id('theme-mode-toggle'));
@@ -109,11 +108,11 @@ describe('Gymflow users lifecycle flow', () => {
 
     await themeButton.tap();
     const themeSymbolAfter = await readElementText(themeButton);
-    await expect(themeSymbolAfter).not.toEqual(themeSymbolBefore);
+    assert.notEqual(themeSymbolAfter, themeSymbolBefore);
 
     await themeButton.tap();
     const themeSymbolAfterSecond = await readElementText(themeButton);
-    await expect(themeSymbolAfterSecond).toEqual(themeSymbolBefore);
+    assert.equal(themeSymbolAfterSecond, themeSymbolBefore);
 
     // Enable delete button in settings
     await element(by.id('settings-button')).tap();
@@ -125,18 +124,19 @@ describe('Gymflow users lifecycle flow', () => {
       await element(by.id('users-list-delete-toggle')).tap();
     }
 
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await element(by.id('app-header-back')).tap();
-    await expect(element(by.label(`Remove ${updatedUserName}`))).toExist();
+    await waitFor(element(by.label(`Remove ${updatedUserName}`))).toExist().withTimeout(5000);
 
     // Cancel delete action
     await element(by.label(`Remove ${updatedUserName}`)).tap();
     await confirmDelete('Cancel', 'delete-user-dialog-cancel');
-    await expect(element(by.text(updatedUserName))).toExist();
+    await detoxExpect(element(by.text(updatedUserName))).toExist();
 
     // Confirm delete action
     await element(by.label(`Remove ${updatedUserName}`)).tap();
     await confirmDelete('Remove', 'delete-user-dialog-confirm');
     await waitFor(element(by.text(updatedUserName))).toNotExist().withTimeout(5000);
-    await expect(element(by.text(updatedUserName))).not.toExist();
+    await detoxExpect(element(by.text(updatedUserName))).not.toExist();
   });
 });

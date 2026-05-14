@@ -50,10 +50,7 @@ export function SettingsScreen(): ReactElement {
     useState(preferences?.showUsersListDeleteButton ?? false);
 
   useEffect((): void => {
-    const preferences = preferencesStorage.getPreferences();
-    if (!preferences) {
-      return;
-    }
+    const preferences = preferencesStorage.getPreferences() ?? {};
     if (
       isSecureModeEnabled !== preferences.isSecureModeEnabled
       || showUsersListDeleteButton !== preferences.showUsersListDeleteButton
