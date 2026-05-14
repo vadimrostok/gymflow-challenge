@@ -1,5 +1,7 @@
 import { Platform } from 'react-native';
 
+import { WEB_BASE_PATH } from '@/constants/web-paths';
+
 export type Painting = {
   height: number;
   uri: string;
@@ -11,7 +13,6 @@ type PaintingAsset = Omit<Painting, 'uri'> & {
 };
 
 const WEB_DEV_ASSET_PREFIX = '/assets/?unstable_path=.%2Fassets%2Fpaintings%2F';
-const DEFAULT_WEB_PAINTINGS_PATH_BASE = 'assets/paintings';
 const DEFAULT_NATIVE_PAINTINGS_URL_BASE = 'http://localhost:8081';
 
 const paintingAssets: PaintingAsset[] = [
@@ -50,7 +51,7 @@ function buildPaintingUri(fileName: string) {
     }
 
     const webPathBase =
-      process.env.EXPO_PUBLIC_WEB_PAINTINGS_PATH_BASE ?? DEFAULT_WEB_PAINTINGS_PATH_BASE;
+      process.env.EXPO_PUBLIC_WEB_PAINTINGS_PATH_BASE ?? `${WEB_BASE_PATH}/assets/paintings`;
 
     return `${trimTrailingSlash(webPathBase)}/${fileName}`;
   }

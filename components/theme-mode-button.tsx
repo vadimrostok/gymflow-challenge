@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { Colors, SharedColors } from '@/constants/theme';
 import { useThemeMode } from '@/state/context/theme-mode';
 
 const themeModeLabels = {
@@ -23,7 +24,7 @@ export function ThemeModeButton() {
         ? 'dark'
         : 'light'
       : resolvedColorScheme;
-  const previewTextColor = previewColorScheme === 'dark' ? '#eee8d5' : '#002b36';
+  const previewTextColor = Colors[previewColorScheme].text;
 
   return (
     <View className="flex-row items-center gap-3">
@@ -45,8 +46,8 @@ export function ThemeModeButton() {
             <View style={styles.checkboxCheckmark} />
             /*<ThemedText
               type="defaultSemiBold"
-              lightColor="#ffffff"
-              darkColor="#002b36"
+              lightColor={Colors.light.primaryButtonText}
+              darkColor={Colors.dark.primaryButtonText}
               className="text-sm leading-4 text-white dark:text-solarized-base03">
               ✓
             </ThemedText>*/
@@ -85,9 +86,9 @@ export function ThemeModeButton() {
 
 const styles = {
   checkboxCheckmark: {
-    borderBottomColor: '#ffffff',
+    borderBottomColor: SharedColors.white,
     borderBottomWidth: 3,
-    borderRightColor: '#ffffff',
+    borderRightColor: SharedColors.white,
     borderRightWidth: 3,
     height: 12,
     marginTop: -2,

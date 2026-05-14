@@ -5,45 +5,100 @@
 
 import { Platform } from 'react-native';
 
+export const SolarizedColors = {
+  base03: '#002b36',
+  base02: '#073642',
+  base01: '#586e75',
+  base00: '#657b83',
+  base0: '#839496',
+  base1: '#93a1a1',
+  base2: '#eee8d5',
+  base3: '#fdf6e3',
+  yellow: '#b58900',
+  orange: '#cb4b16',
+  red: '#dc322f',
+  magenta: '#d33682',
+  violet: '#6c71c4',
+  blue: '#268bd2',
+  cyan: '#2aa198',
+  green: '#859900',
+} as const;
+
+export const SharedColors = {
+  black: '#000000',
+  dangerHover: '#b91c1c',
+  errorDark: '#ff8f8f',
+  formBorderDark: '#31565f',
+  primaryHover: '#276f4b',
+  primaryHoverDark: '#52c98d',
+  selectorDark: '#002f3b',
+  selectorHoverLight: '#d8d1bd',
+  transparent: 'transparent',
+  white: '#ffffff',
+} as const;
+
 const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const tintColorDark = SharedColors.white;
 
 export const Colors = {
   light: {
-    text: '#073642',
-    mutedText: '#586e75',
-    background: '#fdf6e3',
-    surface: '#eee8d5',
+    text: SolarizedColors.base02,
+    mutedText: SolarizedColors.base01,
+    background: SolarizedColors.base3,
+    surface: SolarizedColors.base2,
     border: '#d6cfbd',
+    formBorder: SharedColors.white,
     tint: tintColorLight,
-    onTint: '#ffffff',
+    onTint: SharedColors.white,
     primaryButtonBackground: '#2f855a',
-    primaryButtonText: '#ffffff',
-    accent: '#b58900',
+    primaryButtonHover: SharedColors.primaryHover,
+    primaryButtonText: SharedColors.white,
+    accent: SolarizedColors.yellow,
     accentSoft: '#f4e7b5',
-    danger: '#dc322f',
-    icon: '#586e75',
-    tabIconDefault: '#586e75',
+    danger: SolarizedColors.red,
+    dangerHover: SharedColors.dangerHover,
+    errorText: SolarizedColors.red,
+    icon: SolarizedColors.base01,
+    link: tintColorLight,
+    modalBackdrop: SharedColors.black,
+    selectorBackground: '#e2dcc9',
+    selectorHoverBackground: SharedColors.selectorHoverLight,
+    tabIconDefault: SolarizedColors.base01,
     tabIconSelected: tintColorLight,
+    todayBackground: '#eadb9f',
+    transparentButtonHover: '#e2dcc9',
   },
   dark: {
-    text: '#eee8d5',
-    mutedText: '#93a1a1',
-    background: '#002b36',
-    surface: '#073642',
-    border: '#31565f',
+    text: SolarizedColors.base2,
+    mutedText: SolarizedColors.base1,
+    background: SolarizedColors.base03,
+    surface: SolarizedColors.base02,
+    border: SharedColors.formBorderDark,
+    formBorder: SharedColors.formBorderDark,
     tint: tintColorDark,
-    onTint: '#002b36',
+    onTint: SolarizedColors.base03,
     primaryButtonBackground: '#6ee7a8',
-    primaryButtonText: '#002b36',
-    accent: '#b58900',
+    primaryButtonHover: SharedColors.primaryHoverDark,
+    primaryButtonText: SolarizedColors.base03,
+    accent: SolarizedColors.yellow,
     accentSoft: '#3a3f2c',
-    danger: '#dc322f',
-    icon: '#93a1a1',
-    tabIconDefault: '#93a1a1',
+    danger: SolarizedColors.red,
+    dangerHover: SharedColors.dangerHover,
+    errorText: SharedColors.errorDark,
+    icon: SolarizedColors.base1,
+    link: tintColorDark,
+    modalBackdrop: SharedColors.black,
+    selectorBackground: SharedColors.selectorDark,
+    selectorHoverBackground: '#0b4350',
+    tabIconDefault: SolarizedColors.base1,
     tabIconSelected: tintColorDark,
+    todayBackground: 'rgba(181, 137, 0, 0.2)',
+    transparentButtonHover: '#0b4350',
   },
 };
+
+export type AppColorScheme = keyof typeof Colors;
+export type ThemePalette = (typeof Colors)[AppColorScheme];
 
 export const Fonts = Platform.select({
   ios: {

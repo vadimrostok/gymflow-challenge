@@ -10,6 +10,7 @@ import { AppHeader } from '@/components/app-header';
 import { AppFooter } from '@/components/app-footer';
 import { AppProviders } from '@/components/app-providers';
 import { PageScrollProvider } from '@/components/page-scroll-context';
+import { WEB_BASE_PATH } from '@/constants/web-paths';
 import { EditUserScreen } from '@/screens/edit-user-screen';
 import { NewUserScreen } from '@/screens/new-user-screen';
 import { SettingsScreen } from '@/screens/settings-screen';
@@ -25,7 +26,7 @@ routeTitles.set(/.*/gi, 'Home');
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={WEB_BASE_PATH || undefined}>
       <AppProviders>
         <WebRouter />
       </AppProviders>

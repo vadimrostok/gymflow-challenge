@@ -9,6 +9,7 @@ import { DeleteUserDialog } from '@/components/users/delete-user-dialog';
 import { UsersSyncError } from '@/components/users/users-sync-error';
 import { UsersList } from '@/components/users/users-list';
 import { USER_SCREEN_MAX_WIDTH } from '@/constants/layout';
+import { Colors, SharedColors } from '@/constants/theme';
 import { useAppNavigation } from '@/navigation/use-app-navigation';
 import { useScreenFocusEffect } from '@/navigation/use-screen-focus-effect';
 import { useUsersStore } from '@/state/context/users-context';
@@ -69,13 +70,13 @@ export const UsersScreen = observer(function UsersScreen() {
             className="min-h-11 flex-row items-center gap-2.5 pr-[15px] active:opacity-75">
             <ThemedText
               type="defaultSemiBold"
-              lightColor="#2f855a"
-              darkColor="#6ee7a8"
+              lightColor={Colors.light.primaryButtonBackground}
+              darkColor={Colors.dark.primaryButtonBackground}
               className="leading-5">
               Add User
             </ThemedText>
-            <View className="h-10 w-10 items-center justify-center rounded-full border border-gymflow-primary bg-gymflow-primary hover:border-[#276f4b] hover:bg-[#276f4b] dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark dark:hover:border-[#52c98d] dark:hover:bg-[#52c98d]">
-              <MaterialIcons name="person-add-alt-1" size={20} color="#ffffff" />
+            <View className="h-10 w-10 items-center justify-center rounded-full border border-gymflow-primary bg-gymflow-primary hover:border-gymflow-primaryHover hover:bg-gymflow-primaryHover dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark dark:hover:border-gymflow-primaryHoverDark dark:hover:bg-gymflow-primaryHoverDark">
+              <MaterialIcons name="person-add-alt-1" size={20} color={SharedColors.white} />
             </View>
           </Pressable>
         </View>

@@ -7,6 +7,7 @@ import { AnimatePresence, MotionView } from '@/components/motion-view';
 import { ThemedText } from '@/components/themed-text';
 import { formatUserBirthday } from '@/components/users/format-user-birthday';
 import { FontFamily } from '@/constants/fonts';
+import { Colors, SharedColors } from '@/constants/theme';
 import { useAppNavigation } from '@/navigation/use-app-navigation';
 import type { User } from '@/state/schemas/user-schema';
 
@@ -47,7 +48,7 @@ export function UserListItem({ user, isLast = false, showDeleteButton, onDelete 
           accessibilityLabel={`Open ${user.fullName} profile`}
           accessibilityRole="link"
           onPress={() => navigation.toEditUser(user.id)}
-          className="min-h-[86px] w-full justify-center gap-1.5 rounded-lg border border-white bg-solarized-base2 py-3.5 pl-3.5 pr-[70px] transition-colors duration-500 active:opacity-80 dark:border-[#31565f] dark:bg-solarized-base02">
+          className="min-h-[86px] w-full justify-center gap-1.5 rounded-lg border border-white bg-solarized-base2 py-3.5 pl-3.5 pr-[70px] transition-colors duration-500 active:opacity-80 dark:border-gymflow-borderDark dark:bg-solarized-base02">
           <View className="flex-row flex-wrap items-center gap-2">
             <ThemedText
               type="defaultSemiBold"
@@ -55,18 +56,18 @@ export function UserListItem({ user, isLast = false, showDeleteButton, onDelete 
               style={{ fontFamily: FontFamily.bold }}>
               {user.fullName}
             </ThemedText>
-            <View className="rounded-lg bg-[#f4e7b5] px-2.5 py-1 dark:bg-[#3a3f2c]">
+            <View className="rounded-lg bg-gymflow-accentSoft px-2.5 py-1 dark:bg-gymflow-accentSoftDark">
               <ThemedText
                 type="defaultSemiBold"
-                lightColor="#b58900"
-                darkColor="#b58900"
+                lightColor={Colors.light.accent}
+                darkColor={Colors.dark.accent}
                 className="text-[13px] leading-4 text-solarized-yellow"
                 style={{ fontFamily: FontFamily.italic }}>
                 {user.role === 'STAFF' ? 'Staff' : 'Member'}
               </ThemedText>
             </View>
           </View>
-          <ThemedText lightColor="#586e75" darkColor="#93a1a1">
+          <ThemedText lightColor={Colors.light.mutedText} darkColor={Colors.dark.mutedText}>
             {birthdayLabel}
           </ThemedText>
         </Pressable>
@@ -82,9 +83,9 @@ export function UserListItem({ user, isLast = false, showDeleteButton, onDelete 
             onFocus={() => setIsDeleteTooltipVisible(true)}
             onHoverIn={() => setIsDeleteTooltipVisible(true)}
             onHoverOut={() => setIsDeleteTooltipVisible(false)}
-            className="absolute right-3.5 top-1/2 h-10 w-10 items-center justify-center rounded-full border border-solarized-red bg-solarized-red hover:border-[#b91c1c] hover:bg-[#b91c1c] active:opacity-70"
+            className="absolute right-3.5 top-1/2 h-10 w-10 items-center justify-center rounded-full border border-solarized-red bg-solarized-red hover:border-gymflow-dangerHover hover:bg-gymflow-dangerHover active:opacity-70"
             style={{ transform: [{ translateY: -20 }] }}>
-            <MaterialIcons color="#ffffff" name="delete-outline" size={20} />
+            <MaterialIcons color={SharedColors.white} name="delete-outline" size={20} />
             <AnimatePresence>
               {isDeleteTooltipVisible ? (
                 <MotionView
@@ -94,8 +95,8 @@ export function UserListItem({ user, isLast = false, showDeleteButton, onDelete 
                   transition={{ duration: 0.5 }}
                   className="absolute right-[48px] top-1/2 w-24 -translate-y-1/2 rounded-md bg-solarized-base02 px-2 py-1.5 dark:bg-solarized-base2">
                   <ThemedText
-                    lightColor="#fdf6e3"
-                    darkColor="#002b36"
+                    lightColor={Colors.light.background}
+                    darkColor={Colors.dark.background}
                     className="text-center text-xs leading-[14px]">
                     Delete user
                   </ThemedText>

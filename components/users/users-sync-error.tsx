@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { Colors } from '@/constants/theme';
 import { useUsersStore } from '@/state/context/users-context';
 
 type UsersSyncErrorProps = {
@@ -25,7 +26,10 @@ export const UsersSyncError = observer(function UsersSyncError({
       ]
         .filter(Boolean)
         .join(' ')}>
-      <ThemedText lightColor="#dc322f" darkColor="#ff8f8f" className="text-sm leading-5">
+      <ThemedText
+        lightColor={Colors.light.errorText}
+        darkColor={Colors.dark.errorText}
+        className="text-sm leading-5">
         {usersStore.syncErrorMessage}
       </ThemedText>
     </View>

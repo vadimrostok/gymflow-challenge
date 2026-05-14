@@ -10,7 +10,7 @@ import { AppFooter } from '@/components/app-footer';
 import { HeaderActions } from '@/components/header-actions';
 import { AppProviders } from '@/components/app-providers';
 import { FontFamily } from '@/constants/fonts';
-import { Colors } from '@/constants/theme';
+import { Colors, SharedColors } from '@/constants/theme';
 import { useResolvedColorScheme } from '@/state/context/theme-mode';
 
 export const unstable_settings = {
@@ -114,7 +114,7 @@ function RootLayoutContent() {
 
 const styles = {
   headerLeftButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: SharedColors.transparent,
     height: 44,
     marginLeft: 8,
     width: 44,
@@ -123,7 +123,7 @@ const styles = {
   },
   headerRight: {
     paddingRight: 0,
-    backgroundColor: 'transparent',
+    backgroundColor: SharedColors.transparent,
   },
   headerTitle: {
     fontFamily: FontFamily.bold,

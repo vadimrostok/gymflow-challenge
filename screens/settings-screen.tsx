@@ -2,6 +2,7 @@ import { ReactElement, useEffect, useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { Colors, SharedColors } from '@/constants/theme';
 import { useThemeMode } from '@/state/context/theme-mode';
 import { preferencesStorage } from '@/state/storage/preferences-storage';
 
@@ -36,7 +37,10 @@ const SettingsCheckbox = (
     </View>
     <View className="flex-1 gap-1">
       <ThemedText type="defaultSemiBold">{label}</ThemedText>
-      <ThemedText lightColor="#586e75" darkColor="#93a1a1" className="text-sm leading-5">
+      <ThemedText
+        lightColor={Colors.light.mutedText}
+        darkColor={Colors.dark.mutedText}
+        className="text-sm leading-5">
         {description}
       </ThemedText>
     </View>
@@ -68,7 +72,7 @@ export function SettingsScreen(): ReactElement {
       <View className="w-full max-w-[860px] self-center gap-6 p-5">
         <View className="gap-2">
           <ThemedText type="title">Settings</ThemedText>
-          <ThemedText lightColor="#586e75" darkColor="#93a1a1">
+          <ThemedText lightColor={Colors.light.mutedText} darkColor={Colors.dark.mutedText}>
             Local app preferences for this challenge build.
           </ThemedText>
         </View>
@@ -97,9 +101,9 @@ export function SettingsScreen(): ReactElement {
 
 const styles = {
   checkboxCheckmark: {
-    borderBottomColor: '#ffffff',
+    borderBottomColor: SharedColors.white,
     borderBottomWidth: 3,
-    borderRightColor: '#ffffff',
+    borderRightColor: SharedColors.white,
     borderRightWidth: 3,
     height: 12,
     marginTop: -2,

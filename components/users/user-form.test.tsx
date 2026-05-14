@@ -12,10 +12,14 @@ describe('UserForm', () => {
     );
 
     fireEvent.changeText(screen.getByLabelText('Full Name'), 'Maya Angelou');
-    fireEvent(screen.getByTestId('role-picker'), 'onValueChange', 'STAFF');
+    fireEvent.press(screen.getByTestId('role-picker'));
+    fireEvent(screen.getByTestId('role-picker-modal'), 'onValueChange', 'STAFF');
     fireEvent.changeText(screen.getByLabelText('Date of Birthday'), '1928-04-04');
 
     await waitFor(() => {
+      expect(screen.getByLabelText('Full Name').props.value).toBe('Maya Angelou');
+      expect(screen.getByTestId('role-picker-modal').props.value).toBe('STAFF');
+      expect(screen.getByLabelText('Date of Birthday').props.value).toBe('1928-04-04');
       expect(screen.getByLabelText('Create User').props.accessibilityState.disabled).toBe(false);
     });
 
@@ -32,12 +36,16 @@ describe('UserForm', () => {
     });
   });
 
-  it('disables invalid create submit and only renders Remove User in edit mode', async () => {
+  it('shows validation after invalid create submit and only renders Remove User in edit mode', async () => {
     renderWithTheme(<UserForm mode="create" onCancel={jest.fn()} onSubmit={jest.fn()} />);
 
     expect(screen.queryByText('Remove User')).toBeNull();
+    expect(screen.getByLabelText('Create User').props.accessibilityState.disabled).toBe(false);
+
+    fireEvent.press(screen.getByLabelText('Create User'));
 
     await waitFor(() => {
+      expect(screen.getByText('Full name must be at least 3 characters.')).toBeTruthy();
       expect(screen.getByLabelText('Create User').props.accessibilityState.disabled).toBe(true);
     });
   });

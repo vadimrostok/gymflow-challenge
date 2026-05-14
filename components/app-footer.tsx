@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { Colors } from '@/constants/theme';
 
 export function AppFooter() {
   const year = new Date().getFullYear();
@@ -11,8 +12,8 @@ export function AppFooter() {
       style={{ marginLeft: 'auto', marginRight: 'auto', maxWidth: 860 }}>
       <View className="h-px w-full bg-solarized-base2 dark:bg-solarized-base02" />
       <ThemedText
-        lightColor="#586e75"
-        darkColor="#93a1a1"
+        lightColor={Colors.light.mutedText}
+        darkColor={Colors.dark.mutedText}
         className="pt-3 text-center text-sm leading-5">
         {year}
       </ThemedText>

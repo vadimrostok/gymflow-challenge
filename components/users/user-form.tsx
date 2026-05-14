@@ -34,7 +34,7 @@ import DateTimePicker, {
 } from 'react-native-ui-datepicker';
 
 import { ThemedText } from '@/components/themed-text';
-import { Colors } from '@/constants/theme';
+import { Colors, SharedColors, type AppColorScheme, type ThemePalette } from '@/constants/theme';
 import {
   userFormSchema,
   userRoleOptions,
@@ -60,10 +60,10 @@ type UserFormProps = {
   onDelete?: () => void;
 };
 type RolePickerProps = {
-  colorScheme: 'light' | 'dark';
+  colorScheme: AppColorScheme;
   mode: UserFormProps['mode'];
   onChange: (role: UserRole | '') => void;
-  palette: (typeof Colors)['light'];
+  palette: ThemePalette;
   rolePickerStyles: ReturnType<typeof createRolePickerStyles>;
   value: UserRole | '';
 };
@@ -75,7 +75,7 @@ const emptyUserFormValues: UserFormValues = {
 };
 const nativePickerContentPointerEvents = Platform.OS === 'web' ? undefined : ('none' as const);
 
-function createRolePickerStyles(palette: (typeof Colors)['light'], formBorderColor: string) {
+function createRolePickerStyles(palette: ThemePalette, formBorderColor: string) {
   const container = {
     backgroundColor: palette.surface,
     borderColor: formBorderColor,
@@ -86,7 +86,7 @@ function createRolePickerStyles(palette: (typeof Colors)['light'], formBorderCol
     width: '100%' as const,
   };
   const picker = {
-    backgroundColor: 'transparent',
+    backgroundColor: SharedColors.transparent,
     color: palette.text,
     fontSize: 16,
     minHeight: 48,
@@ -107,7 +107,7 @@ function createRolePickerStyles(palette: (typeof Colors)['light'], formBorderCol
   };
   const modalBackdropTint = {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000000',
+    backgroundColor: palette.modalBackdrop,
   };
   const modalSheet = {
     backgroundColor: palette.surface,
@@ -164,7 +164,7 @@ function DatePickerDay({ day }: { day: CalendarDay }) {
       className={[
         'h-full w-full items-center justify-center rounded-md',
         day.isDisabled ? 'opacity-40' : 'hover:bg-gymflow-primary/10 dark:hover:bg-gymflow-primaryDark/15',
-        day.isToday ? 'bg-[#eadb9f] dark:bg-solarized-yellow/20' : '',
+        day.isToday ? 'bg-gymflow-today dark:bg-solarized-yellow/20' : '',
         day.isSelected
           ? 'bg-gymflow-primary hover:bg-gymflow-primary dark:bg-gymflow-primaryDark dark:hover:bg-gymflow-primaryDark'
           : '',
@@ -172,8 +172,8 @@ function DatePickerDay({ day }: { day: CalendarDay }) {
       pointerEvents={nativePickerContentPointerEvents}>
       <ThemedText
         type={day.isSelected ? 'defaultSemiBold' : 'default'}
-        lightColor={day.isSelected ? '#ffffff' : undefined}
-        darkColor={day.isSelected ? '#002b36' : undefined}>
+        lightColor={day.isSelected ? Colors.light.primaryButtonText : undefined}
+        darkColor={day.isSelected ? Colors.dark.primaryButtonText : undefined}>
         {day.text}
       </ThemedText>
     </View>
@@ -193,8 +193,8 @@ function DatePickerMonth({ month }: { month: CalendarMonth }) {
       pointerEvents={nativePickerContentPointerEvents}>
       <ThemedText
         type={month.isSelected ? 'defaultSemiBold' : 'default'}
-        lightColor={month.isSelected ? '#ffffff' : undefined}
-        darkColor={month.isSelected ? '#002b36' : undefined}>
+        lightColor={month.isSelected ? Colors.light.primaryButtonText : undefined}
+        darkColor={month.isSelected ? Colors.dark.primaryButtonText : undefined}>
         {month.name.short}
       </ThemedText>
     </View>
@@ -207,7 +207,7 @@ function DatePickerYear({ year }: { year: CalendarYear }) {
       className={[
         'h-full w-full items-center justify-center rounded-md',
         'hover:bg-gymflow-primary/10 dark:hover:bg-gymflow-primaryDark/15',
-        year.isActivated && !year.isSelected ? 'bg-[#eadb9f] dark:bg-solarized-yellow/20' : '',
+        year.isActivated && !year.isSelected ? 'bg-gymflow-today dark:bg-solarized-yellow/20' : '',
         year.isSelected
           ? 'bg-gymflow-primary hover:bg-gymflow-primary dark:bg-gymflow-primaryDark dark:hover:bg-gymflow-primaryDark'
           : '',
@@ -215,8 +215,8 @@ function DatePickerYear({ year }: { year: CalendarYear }) {
       pointerEvents={nativePickerContentPointerEvents}>
       <ThemedText
         type={year.isSelected || year.isActivated ? 'defaultSemiBold' : 'default'}
-        lightColor={year.isSelected ? '#ffffff' : undefined}
-        darkColor={year.isSelected ? '#002b36' : undefined}>
+        lightColor={year.isSelected ? Colors.light.primaryButtonText : undefined}
+        darkColor={year.isSelected ? Colors.dark.primaryButtonText : undefined}>
         {year.text}
       </ThemedText>
     </View>
@@ -391,9 +391,9 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
   const now = useRef<Date>(new Date());
   const defaultDatePickerStyles = useDefaultStyles();
   const defaultClassNames = useDefaultClassNames();
-  const datePickerEmphasisColor = colorScheme === 'dark' ? palette.accent : '#6c71c4';
-  const datePickerSelectorBackground = colorScheme === 'dark' ? '#002f3b' : '#e2dcc9';
-  const formBorderColor = colorScheme === 'dark' ? '#31565f' : '#ffffff';
+  const datePickerEmphasisColor = colorScheme === 'dark' ? palette.accent : Colors.light.tint;
+  const datePickerSelectorBackground = palette.selectorBackground;
+  const formBorderColor = palette.formBorder;
   const datePickerStyles = useMemo(
     () => ({
       ...defaultDatePickerStyles,
@@ -402,7 +402,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
       day_label: { color: palette.text },
       disabled_label: { color: palette.mutedText },
       today: {
-        backgroundColor: colorScheme === 'dark' ? 'rgba(181, 137, 0, 0.2)' : '#eadb9f',
+        backgroundColor: palette.todayBackground,
         borderColor: palette.accent,
       },
       month_label: {
@@ -466,7 +466,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
         fontWeight: '700',
       },
     }),
-    [colorScheme, datePickerEmphasisColor, datePickerSelectorBackground, defaultDatePickerStyles, palette]
+    [datePickerEmphasisColor, datePickerSelectorBackground, defaultDatePickerStyles, palette]
   );
   const datePickerComponents = useMemo(
     () => ({
@@ -508,7 +508,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
               className={
                 clsx.clsx(
                   'min-h-12 rounded-lg border border-white bg-solarized-base2 px-3.5 text-xl'
-                  + ' text-solarized-base02 dark:border-[#31565f] dark:bg-solarized-base02 dark:text-solarized-base2', {
+                  + ' text-solarized-base02 dark:border-gymflow-borderDark dark:bg-solarized-base02 dark:text-solarized-base2', {
                   'text-lg': Platform.OS === 'web',
                   'text-xl': Platform.OS !== 'web',
                   'pb-2': Platform.OS !== 'web',
@@ -518,7 +518,10 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           )}
         />
         {errors.fullName ? (
-          <ThemedText lightColor="#dc322f" darkColor="#dc322f" className="text-sm leading-5">
+          <ThemedText
+            lightColor={Colors.light.errorText}
+            darkColor={Colors.dark.errorText}
+            className="text-sm leading-5">
             {errors.fullName.message}
           </ThemedText>
         ) : null}
@@ -541,7 +544,10 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           )}
         />
         {errors.role ? (
-          <ThemedText lightColor="#dc322f" darkColor="#dc322f" className="text-sm leading-5">
+          <ThemedText
+            lightColor={Colors.light.errorText}
+            darkColor={Colors.dark.errorText}
+            className="text-sm leading-5">
             {errors.role.message}
           </ThemedText>
         ) : null}
@@ -554,7 +560,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           name="dateOfBirth"
           render={({ field: { onChange, value } }) => (
             <DateTimePicker
-              className="rounded-lg border border-white bg-solarized-base2 p-3 transition-colors duration-500 dark:border-[#31565f] dark:bg-solarized-base02"
+              className="rounded-lg border border-white bg-solarized-base2 p-3 transition-colors duration-500 dark:border-gymflow-borderDark dark:bg-solarized-base02"
               components={datePickerComponents}
               mode="single"
               date={getDefaultDatePickerValue(value ?? '')}
@@ -572,7 +578,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
                 disabled: 'opacity-40',
                 disabled_label: 'text-solarized-base1 dark:text-solarized-base01',
                 month_label: 'font-semibold',
-                month_selector: 'mr-2 rounded-lg bg-[#e2dcc9] px-2.5 py-1 hover:bg-[#d8d1bd] dark:bg-[#002f3b] dark:hover:bg-[#0b4350]',
+                month_selector: 'mr-2 rounded-lg bg-gymflow-selector px-2.5 py-1 hover:bg-gymflow-selectorHover dark:bg-gymflow-selectorDark dark:hover:bg-gymflow-mutedHoverDark',
                 month_selector_label: 'text-xl font-bold',
                 outside_label: 'text-solarized-base1 dark:text-solarized-base01',
                 selected: 'border-gymflow-primary bg-gymflow-primary dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark',
@@ -581,11 +587,11 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
                 selected_year_label: 'font-bold',
                 time_label: 'text-solarized-base02 dark:text-solarized-base2',
                 time_selected_indicator: 'bg-solarized-base2 dark:bg-solarized-base02',
-                today: 'border-solarized-yellow bg-[#eadb9f] dark:bg-solarized-yellow/20',
+                today: 'border-solarized-yellow bg-gymflow-today dark:bg-solarized-yellow/20',
                 today_label: 'text-solarized-yellow',
                 weekday_label: 'text-sm uppercase text-solarized-base01 dark:text-solarized-base1',
                 year_label: 'font-semibold',
-                year_selector: 'rounded-lg bg-[#e2dcc9] px-2.5 py-1 hover:bg-[#d8d1bd] dark:bg-[#002f3b] dark:hover:bg-[#0b4350]',
+                year_selector: 'rounded-lg bg-gymflow-selector px-2.5 py-1 hover:bg-gymflow-selectorHover dark:bg-gymflow-selectorDark dark:hover:bg-gymflow-mutedHoverDark',
                 year_selector_label: 'text-xl font-bold',
                 active_year_label: 'font-semibold',
               }}
@@ -593,7 +599,10 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           )}
         />
         {errors.dateOfBirth ? (
-          <ThemedText lightColor="#dc322f" darkColor="#dc322f" className="text-sm leading-5">
+          <ThemedText
+            lightColor={Colors.light.errorText}
+            darkColor={Colors.dark.errorText}
+            className="text-sm leading-5">
             {errors.dateOfBirth.message}
           </ThemedText>
         ) : null}
@@ -608,10 +617,13 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           disabled={isSubmitDisabled}
           onPress={handleSubmit((values) => onSubmit({ ...values, role: values.role as UserRole }))}
           className={[
-            'min-h-12 items-center justify-center rounded-lg bg-gymflow-primary px-[18px] hover:bg-[#276f4b] active:opacity-75 dark:bg-gymflow-primaryDark dark:hover:bg-[#52c98d]',
+            'min-h-12 items-center justify-center rounded-lg bg-gymflow-primary px-[18px] hover:bg-gymflow-primaryHover active:opacity-75 dark:bg-gymflow-primaryDark dark:hover:bg-gymflow-primaryHoverDark',
             isSubmitDisabled ? 'opacity-45' : '',
           ].join(' ')}>
-          <ThemedText lightColor="#ffffff" darkColor="#002b36" className="font-bold">
+          <ThemedText
+            lightColor={Colors.light.primaryButtonText}
+            darkColor={Colors.dark.primaryButtonText}
+            className="font-bold">
             {mode === 'create' ? 'Create User' : 'Save Changes'}
           </ThemedText>
         </Pressable>
@@ -619,7 +631,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
           testID="users-form-cancel"
           accessibilityRole="button"
           onPress={onCancel}
-          className="min-h-12 items-center justify-center rounded-lg border border-solarized-base1 px-[18px] hover:bg-[#e2dcc9] active:opacity-75 dark:border-solarized-base01 dark:hover:bg-[#0b4350]">
+          className="min-h-12 items-center justify-center rounded-lg border border-solarized-base1 px-[18px] hover:bg-gymflow-mutedHover active:opacity-75 dark:border-solarized-base01 dark:hover:bg-gymflow-mutedHoverDark">
           <ThemedText type="defaultSemiBold">Cancel</ThemedText>
         </Pressable>
         {mode === 'edit' && onDelete ? (
@@ -627,9 +639,12 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
             testID="users-form-delete"
             accessibilityRole="button"
             onPress={onDelete}
-            className="min-h-12 flex-row items-center justify-center gap-2 rounded-lg bg-solarized-red px-[18px] hover:bg-[#b91c1c] active:opacity-75">
-            <MaterialIcons color="#ffffff" name="delete-outline" size={18} />
-            <ThemedText type="defaultSemiBold" lightColor="#ffffff" darkColor="#ffffff">
+            className="min-h-12 flex-row items-center justify-center gap-2 rounded-lg bg-solarized-red px-[18px] hover:bg-gymflow-dangerHover active:opacity-75">
+            <MaterialIcons color={SharedColors.white} name="delete-outline" size={18} />
+            <ThemedText
+              type="defaultSemiBold"
+              lightColor={SharedColors.white}
+              darkColor={SharedColors.white}>
               Remove User
             </ThemedText>
           </Pressable>

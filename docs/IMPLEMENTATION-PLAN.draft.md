@@ -157,3 +157,7 @@
 - back button ui is off on ios
 - move page title left-er on ios
 - wierd issue - when choosing date for the first time, datepicker selects previous day always, but further changes are okay
+- gh pages deployment
+- auto-tests action
+- sonar/copilot
+- 
