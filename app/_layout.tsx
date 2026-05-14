@@ -3,7 +3,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 import 'react-native-reanimated';
 import '../global.css';
 
@@ -39,12 +39,20 @@ function RootLayoutContent() {
   const router = useRouter();
   const colorScheme = useResolvedColorScheme();
   const palette = Colors[colorScheme];
+  const webColorTransition =
+    Platform.OS === 'web'
+      ? {
+          transitionDuration: '500ms',
+          transitionProperty: 'background-color, border-color, color',
+          transitionTimingFunction: 'ease',
+        }
+      : {};
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack
         screenOptions={{
-          contentStyle: { backgroundColor: palette.background },
+          contentStyle: { backgroundColor: palette.background, ...webColorTransition },
           headerLeft: ({ canGoBack }) =>
             canGoBack ? (
               <Pressable
@@ -61,9 +69,9 @@ function RootLayoutContent() {
             </View>
           ),
           headerShadowVisible: false,
-          headerStyle: { backgroundColor: palette.background },
+          headerStyle: { backgroundColor: palette.background, ...webColorTransition },
           headerTitle: ({ children, tintColor }) => (
-            <Text style={[styles.headerTitle, { color: tintColor ?? palette.text }]}>
+            <Text style={[styles.headerTitle, { color: tintColor ?? palette.text }, webColorTransition]}>
               {children}
             </Text>
           ),

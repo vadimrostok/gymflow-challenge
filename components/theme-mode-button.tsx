@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -15,6 +16,14 @@ const themeModeSymbols = {
 
 export function ThemeModeButton() {
   const { isAuto, resolvedColorScheme, setIsAuto, cycleThemeMode } = useThemeMode();
+  const [isThemeButtonHovered, setIsThemeButtonHovered] = useState(false);
+  const previewColorScheme =
+    isThemeButtonHovered && !isAuto
+      ? resolvedColorScheme === 'light'
+        ? 'dark'
+        : 'light'
+      : resolvedColorScheme;
+  const previewTextColor = previewColorScheme === 'dark' ? '#eee8d5' : '#002b36';
 
   return (
     <View className="flex-row items-center gap-3">
@@ -23,12 +32,12 @@ export function ThemeModeButton() {
         accessibilityRole="checkbox"
         accessibilityState={{ checked: isAuto }}
         onPress={() => setIsAuto(!isAuto)}
-        className="min-h-10 flex-row items-center gap-1.5 active:opacity-70">
+        className="min-h-10 flex-row items-center gap-1.5 rounded-md px-1 transition-colors duration-500 hover:bg-solarized-base2 active:opacity-70 dark:hover:bg-solarized-base02">
         <View
           className={
             isAuto
-              ? 'h-[18px] w-[18px] items-center justify-center rounded border border-gymflow-primary bg-gymflow-primary dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark'
-              : 'h-[18px] w-[18px] items-center justify-center rounded border border-solarized-base1 bg-solarized-base2 dark:border-solarized-base01 dark:bg-solarized-base02'
+              ? 'h-[18px] w-[18px] items-center justify-center rounded border border-gymflow-primary bg-gymflow-primary transition-colors duration-500 dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark'
+              : 'h-[18px] w-[18px] items-center justify-center rounded border border-solarized-base1 bg-solarized-base2 transition-colors duration-500 dark:border-solarized-base01 dark:bg-solarized-base02'
           }>
           {isAuto ? (
             <ThemedText
@@ -49,10 +58,20 @@ export function ThemeModeButton() {
         accessibilityRole="button"
         accessibilityState={{ disabled: isAuto }}
         disabled={isAuto}
+        onHoverIn={() => setIsThemeButtonHovered(true)}
+        onHoverOut={() => setIsThemeButtonHovered(false)}
         onPress={cycleThemeMode}
-        className="h-9 w-9 items-center justify-center rounded-full border border-solarized-base1 bg-solarized-base2 active:opacity-70 disabled:opacity-45 dark:border-solarized-base01 dark:bg-solarized-base02">
-        <ThemedText type="defaultSemiBold" className="text-[17px] leading-[21px]">
-          {themeModeSymbols[resolvedColorScheme]}
+        className={
+          previewColorScheme === 'dark'
+            ? 'h-9 w-9 items-center justify-center rounded-full border border-solarized-base01 bg-solarized-base02 transition-colors duration-500 active:opacity-70 disabled:opacity-45'
+            : 'h-9 w-9 items-center justify-center rounded-full border border-solarized-base1 bg-solarized-base2 transition-colors duration-500 active:opacity-70 disabled:opacity-45'
+        }>
+        <ThemedText
+          type="defaultSemiBold"
+          lightColor={previewTextColor}
+          darkColor={previewTextColor}
+          className="text-[17px] leading-[21px]">
+          {themeModeSymbols[previewColorScheme]}
         </ThemedText>
       </Pressable>
     </View>

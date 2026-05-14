@@ -16,7 +16,7 @@ export function HeaderActions() {
         <Pressable
           accessibilityLabel="Settings"
           accessibilityRole="button"
-          className="h-9 w-9 items-center justify-center rounded-full border border-solarized-base1 bg-solarized-base2 active:opacity-70 dark:border-solarized-base01 dark:bg-solarized-base02">
+          className="h-9 w-9 items-center justify-center rounded-full border border-solarized-base1 bg-solarized-base2 hover:bg-[#e2dcc9] active:opacity-70 dark:border-solarized-base01 dark:bg-solarized-base02 dark:hover:bg-[#0b4350]">
           <MaterialIcons color={palette.text} name="settings" size={19} />
         </Pressable>
       </Link>

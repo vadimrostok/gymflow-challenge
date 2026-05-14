@@ -10,6 +10,7 @@ export type ThemedTextProps = TextProps & {
 };
 
 export function ThemedText({
+  className,
   style,
   lightColor,
   darkColor,
@@ -20,6 +21,7 @@ export function ThemedText({
 
   return (
     <Text
+      className={['transition-colors duration-500', className].filter(Boolean).join(' ')}
       style={[
         { color },
         type === 'default' ? styles.default : undefined,

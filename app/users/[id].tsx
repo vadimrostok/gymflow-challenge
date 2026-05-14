@@ -1,9 +1,10 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import { Alert, Platform, View } from 'react-native';
-import Animated, { FadeInUp } from 'react-native-reanimated';
+import { Alert, Platform, ScrollView, View } from 'react-native';
 
+import { AppFooter } from '@/components/app-footer';
+import { MotionView } from '@/components/motion-view';
 import { ThemedText } from '@/components/themed-text';
 import { DeleteUserDialog } from '@/components/users/delete-user-dialog';
 import { UserForm } from '@/components/users/user-form';
@@ -53,20 +54,33 @@ const EditUserScreen = observer(function EditUserScreen() {
   }
 
   return (
-    <View className="flex-1 bg-solarized-base3 dark:bg-solarized-base03">
-      <View className="absolute left-0 right-0 top-0 h-44 bg-solarized-base2 dark:bg-solarized-base02" />
-      <Animated.View entering={FadeInUp.duration(220)}>
-        <View className="w-full max-w-[860px] self-center gap-[22px] p-5">
-          <ThemedText type="title">Edit User</ThemedText>
-          <UserForm
-            initialUser={existingUser}
-            mode="edit"
-            onCancel={() => router.canGoBack() ? router.back() : router.replace('/users')}
-            onDelete={requestDeleteUser}
-            onSubmit={saveUser}
-          />
-        </View>
-      </Animated.View>
+    <View className="flex-1 bg-solarized-base3 transition-colors duration-500 dark:bg-solarized-base03">
+      <View className="absolute left-0 right-0 top-0 h-44 bg-solarized-base2 transition-colors duration-500 dark:bg-solarized-base02" />
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'space-between' }}
+        showsVerticalScrollIndicator={false}>
+        <MotionView
+          key={`users-edit-enter-${existingUser.id}`}
+          initial={{ opacity: 0, y: -64 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+          style={{ alignItems: 'center', display: 'flex', width: '100%' }}>
+          <View
+            className="w-full gap-[22px] p-5"
+            style={{ marginLeft: 'auto', marginRight: 'auto', maxWidth: 860 }}>
+            <ThemedText type="title">Edit User</ThemedText>
+            <UserForm
+              initialUser={existingUser}
+              mode="edit"
+              onCancel={() => router.canGoBack() ? router.back() : router.replace('/users')}
+              onDelete={requestDeleteUser}
+              onSubmit={saveUser}
+            />
+          </View>
+        </MotionView>
+        <AppFooter />
+      </ScrollView>
       <DeleteUserDialog
         isVisible={isDeleteDialogVisible}
         userName={existingUser.fullName}
