@@ -10,11 +10,20 @@ import {
   Modal,
   Platform,
   Pressable,
+  StyleSheet,
   TextInput,
   useWindowDimensions,
   View,
 } from 'react-native';
 import { useMemo, useRef, useState } from 'react';
+import Animated, {
+  Easing,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import DateTimePicker, {
   type CalendarDay,
   type CalendarMonth,
@@ -93,9 +102,12 @@ function createRolePickerStyles(palette: (typeof Colors)['light'], formBorderCol
     paddingRight: 22,
   };
   const modalBackdrop = {
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
     flex: 1,
     justifyContent: 'flex-end' as const,
+  };
+  const modalBackdropTint = {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#000000',
   };
   const modalSheet = {
     backgroundColor: palette.surface,
@@ -113,7 +125,7 @@ function createRolePickerStyles(palette: (typeof Colors)['light'], formBorderCol
     paddingHorizontal: 16,
   };
 
-  return { compactInput, container, modalActions, modalBackdrop, modalSheet, picker };
+  return { compactInput, container, modalActions, modalBackdrop, modalBackdropTint, modalSheet, picker };
 }
 
 function getDefaultDatePickerValue(value: string) {
@@ -220,13 +232,49 @@ function RolePicker({
   value,
 }: RolePickerProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isPickerMounted, setIsPickerMounted] = useState(false);
+  const pickerProgress = useSharedValue(0);
+  const backdropStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(pickerProgress.value, [0, 1], [0, 0.25]),
+  }));
+  const sheetStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateY: interpolate(pickerProgress.value, [0, 1], [360, 0]),
+      },
+    ],
+  }));
   const selectedRoleLabel =
     userRoleOptions.find((option) => option.value === value)?.label ??
     (mode === 'create' ? 'Choose role' : '');
-  const closePicker = () => {
+
+  function openPicker() {
+    Keyboard.dismiss();
+    setIsPickerMounted(true);
+    setIsPickerOpen(true);
+    pickerProgress.value = 0;
+    pickerProgress.value = withTiming(1, {
+      duration: 240,
+      easing: Easing.out(Easing.cubic),
+    });
+  }
+
+  function closePicker() {
     Keyboard.dismiss();
     setIsPickerOpen(false);
-  };
+    pickerProgress.value = withTiming(
+      0,
+      {
+        duration: 180,
+        easing: Easing.in(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(setIsPickerMounted)(false);
+        }
+      }
+    );
+  }
 
   if (Platform.OS === 'ios') {
     return (
@@ -234,10 +282,7 @@ function RolePicker({
         <Pressable
           accessibilityLabel="Role"
           accessibilityRole="button"
-          onPress={() => {
-            Keyboard.dismiss();
-            setIsPickerOpen(true);
-          }}
+          onPress={openPicker}
           style={[rolePickerStyles.container, rolePickerStyles.compactInput]}
           testID="role-picker">
           <ThemedText
@@ -247,11 +292,15 @@ function RolePicker({
           </ThemedText>
           <MaterialIcons color={palette.mutedText} name="keyboard-arrow-down" size={22} />
         </Pressable>
-        <Modal animationType="slide" transparent visible={isPickerOpen}>
+        <Modal animationType="none" transparent visible={isPickerMounted || isPickerOpen}>
           <Pressable style={rolePickerStyles.modalBackdrop} onPress={closePicker}>
-            <View
+            <Animated.View
+              pointerEvents="none"
+              style={[rolePickerStyles.modalBackdropTint, backdropStyle]}
+            />
+            <Animated.View
               onStartShouldSetResponder={() => true}
-              style={rolePickerStyles.modalSheet}>
+              style={[rolePickerStyles.modalSheet, sheetStyle]}>
               <View style={rolePickerStyles.modalActions}>
                 <Pressable onPress={closePicker}>
                   <ThemedText type="defaultSemiBold">Cancel</ThemedText>
@@ -285,7 +334,7 @@ function RolePicker({
                   />
                 ))}
               </Picker>
-            </View>
+            </Animated.View>
           </Pressable>
         </Modal>
       </>
@@ -327,7 +376,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitted, isSubmitting },
   } = useForm<UserFormValues>({
     defaultValues: initialUser ?? emptyUserFormValues,
     resolver: zodResolver(userFormSchema),
@@ -432,7 +481,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
     role: roleValue,
     dateOfBirth: dateOfBirthValue,
   }).success;
-  const isSubmitDisabled = !isFormValid || isSubmitting;
+  const isSubmitDisabled = isSubmitting || (isSubmitted && !isFormValid);
   const rolePickerStyles = useMemo(
     () => createRolePickerStyles(palette, formBorderColor),
     [formBorderColor, palette]
