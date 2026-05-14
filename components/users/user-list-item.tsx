@@ -39,9 +39,8 @@ export function UserListItem({ user, isLast = false, showDeleteButton, onDelete 
       }}
       transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
       style={{
-        willChange: 'marginBottom',
-        overflow: 'visible'
-    }}>
+        overflow: 'visible',
+      }}>
       <View className="relative w-full rounded-lg">
         <Pressable
           accessibilityRole="link"
