@@ -62,10 +62,11 @@ export function ThemeModeButton() {
         onHoverIn={() => setIsThemeButtonHovered(true)}
         onHoverOut={() => setIsThemeButtonHovered(false)}
         onPress={cycleThemeMode}
+        style={{ opacity: isAuto ? 0.45 : 1 }}
         className={
           previewColorScheme === 'dark'
-            ? 'h-9 w-9 items-center justify-center rounded-full border border-solarized-base01 bg-solarized-base02 transition-colors duration-500 active:opacity-70 disabled:opacity-45'
-            : 'h-9 w-9 items-center justify-center rounded-full border border-solarized-base1 bg-solarized-base2 transition-colors duration-500 active:opacity-70 disabled:opacity-45'
+            ? 'h-9 w-9 items-center justify-center rounded-full border border-solarized-base01 bg-solarized-base02 transition-colors duration-500 active:opacity-70'
+            : 'h-9 w-9 items-center justify-center rounded-full border border-solarized-base1 bg-solarized-base2 transition-colors duration-500 active:opacity-70'
         }>
         <ThemedText
           type="defaultSemiBold"

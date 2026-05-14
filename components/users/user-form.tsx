@@ -148,12 +148,14 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<UserFormValues>({
     defaultValues: initialUser ?? emptyUserFormValues,
     resolver: zodResolver(userFormSchema),
   });
   const fullNameValue = useWatch({ control, name: 'fullName' });
+  const roleValue = useWatch({ control, name: 'role' });
+  const dateOfBirthValue = useWatch({ control, name: 'dateOfBirth' });
   const isFullNameWide = (fullNameValue?.length ?? 0) > 42;
   const halfFieldStyle = isWideLayout ? { maxWidth: '50%' as const } : undefined;
   const fullNameFieldStyle = isWideLayout && !isFullNameWide ? halfFieldStyle : undefined;
@@ -246,6 +248,12 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
     }),
     []
   );
+  const isFormValid = userFormSchema.safeParse({
+    fullName: fullNameValue,
+    role: roleValue,
+    dateOfBirth: dateOfBirthValue,
+  }).success;
+  const isSubmitDisabled = !isFormValid || isSubmitting;
   const pickerStyles = useMemo<PickerStyle>(() => {
     const pickerInput = {
       backgroundColor: palette.surface,
@@ -393,9 +401,15 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
 
       <View className="mt-2 flex-row flex-wrap gap-3">
         <Pressable
+          accessibilityLabel={mode === 'create' ? 'Create User' : 'Save Changes'}
           accessibilityRole="button"
+          accessibilityState={{ disabled: isSubmitDisabled }}
+          disabled={isSubmitDisabled}
           onPress={handleSubmit((values) => onSubmit({ ...values, role: values.role as UserRole }))}
-          className="min-h-12 items-center justify-center rounded-lg bg-gymflow-primary px-[18px] hover:bg-[#276f4b] active:opacity-75 dark:bg-gymflow-primaryDark dark:hover:bg-[#52c98d]">
+          className={[
+            'min-h-12 items-center justify-center rounded-lg bg-gymflow-primary px-[18px] hover:bg-[#276f4b] active:opacity-75 dark:bg-gymflow-primaryDark dark:hover:bg-[#52c98d]',
+            isSubmitDisabled ? 'opacity-45' : '',
+          ].join(' ')}>
           <ThemedText lightColor="#ffffff" darkColor="#002b36" className="font-bold">
             {mode === 'create' ? 'Create User' : 'Save Changes'}
           </ThemedText>

@@ -105,8 +105,12 @@ describe('UsersStore', () => {
   });
 
   it('loads users from Supabase and mirrors the returned data', async () => {
+    jest.useFakeTimers();
+
     const { client } = createSupabaseClientMock({ loadData: [serverUser] });
     const usersStore = createUsersStore(client);
+
+    expect(usersStore.isLoadingUsers).toBe(true);
 
     await flushPromises();
 
@@ -120,6 +124,17 @@ describe('UsersStore', () => {
         dateOfBirth: serverUser.dateOfBirth,
       },
     ]);
+    expect(usersStore.isLoadingUsers).toBe(true);
+
+    jest.advanceTimersByTime(499);
+
+    expect(usersStore.isLoadingUsers).toBe(true);
+
+    jest.advanceTimersByTime(1);
+
+    expect(usersStore.isLoadingUsers).toBe(false);
+
+    jest.useRealTimers();
   });
 
   it('creates users optimistically and then mirrors the Supabase response', async () => {

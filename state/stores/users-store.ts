@@ -119,8 +119,11 @@ function toSupabaseUpdate(user: User): Partial<SupabaseUserRow> {
 export class UsersStore {
   private supabaseClient: UsersSupabaseClient | null;
   private syncErrorTimeout: ReturnType<typeof setTimeout> | undefined;
+  private usersLoadingTimeout: ReturnType<typeof setTimeout> | undefined;
+  private usersLoadRequestId = 0;
 
   users: User[] = observable(initialUsers);
+  isLoadingUsers = false;
   syncErrorMessage = '';
 
   constructor(supabaseClient: UsersSupabaseClient | null = supabase as UsersSupabaseClient | null) {
@@ -144,19 +147,30 @@ export class UsersStore {
       return;
     }
 
-    const { data, error } = await this.supabaseClient
-      .from('users')
-      .select()
-      .order('fullName', { ascending: true });
+    const requestId = this.startUsersLoading();
+    const startedAt = Date.now();
 
-    if (error) {
-      this.showSyncError(`Could not load users: ${error.message ?? 'Supabase request failed.'}`);
-      return;
+    try {
+      const { data, error } = await this.supabaseClient
+        .from('users')
+        .select()
+        .order('fullName', { ascending: true });
+
+      if (requestId !== this.usersLoadRequestId) {
+        return;
+      }
+
+      if (error) {
+        this.showSyncError(`Could not load users: ${error.message ?? 'Supabase request failed.'}`);
+        return;
+      }
+
+      runInAction(() => {
+        this.users = (data ?? []).map(toUser);
+      });
+    } finally {
+      this.finishUsersLoading(requestId, startedAt);
     }
-
-    runInAction(() => {
-      this.users = (data ?? []).map(toUser);
-    });
   }
 
   async createUser(values: UserFormValues) {
@@ -302,6 +316,35 @@ export class UsersStore {
         this.syncErrorMessage = '';
       });
     }, 4000);
+  }
+
+  private startUsersLoading() {
+    const requestId = this.usersLoadRequestId + 1;
+
+    this.usersLoadRequestId = requestId;
+
+    if (this.usersLoadingTimeout) {
+      clearTimeout(this.usersLoadingTimeout);
+      this.usersLoadingTimeout = undefined;
+    }
+
+    runInAction(() => {
+      this.isLoadingUsers = true;
+    });
+
+    return requestId;
+  }
+
+  private finishUsersLoading(requestId: number, startedAt: number) {
+    const remainingLoadingTime = Math.max(0, 500 - (Date.now() - startedAt));
+
+    this.usersLoadingTimeout = setTimeout(() => {
+      runInAction(() => {
+        if (requestId === this.usersLoadRequestId) {
+          this.isLoadingUsers = false;
+        }
+      });
+    }, remainingLoadingTime);
   }
 }
 
