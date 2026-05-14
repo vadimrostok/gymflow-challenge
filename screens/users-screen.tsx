@@ -73,6 +73,7 @@ export const UsersScreen = observer(function UsersScreen() {
         </View>
         <UsersList
           containerStyle={{ maxWidth: USER_SCREEN_MAX_WIDTH }}
+          isLoading={usersStore.isLoadingUsers}
           onDeleteUser={requestDeleteUser}
           users={usersStore.sortedUsers}
         />

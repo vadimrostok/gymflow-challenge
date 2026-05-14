@@ -1,9 +1,13 @@
 import type { ViewStyle } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { observer } from 'mobx-react-lite';
-import { View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Animated, Easing, View } from 'react-native';
 
 import { AnimatePresence } from '@/components/motion-view';
 import { ThemedText } from '@/components/themed-text';
+import { Colors } from '@/constants/theme';
+import { useResolvedColorScheme } from '@/state/context/theme-mode';
 import { UserListItem } from '@/components/users/user-list-item';
 import type { User } from '@/state/schemas/user-schema';
 import { preferencesStorage } from '@/state/storage/preferences-storage';
@@ -11,15 +15,62 @@ import { preferencesStorage } from '@/state/storage/preferences-storage';
 type UsersListProps = {
   users: User[];
   containerStyle?: ViewStyle;
+  isLoading?: boolean;
   onDeleteUser: (user: User) => void;
 };
 
-export const UsersList = observer(function UsersList({ containerStyle, users, onDeleteUser }: UsersListProps) {
+function UsersLoadingSpinner() {
+  const colorScheme = useResolvedColorScheme();
+  const palette = Colors[colorScheme];
+  const rotation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.timing(rotation, {
+        duration: 900,
+        easing: Easing.linear,
+        toValue: 1,
+        useNativeDriver: true,
+      })
+    );
+
+    animation.start();
+
+    return () => animation.stop();
+  }, [rotation]);
+
+  return (
+    <View accessibilityLabel="Loading users" className="items-center justify-center py-12">
+      <Animated.View
+        style={{
+          transform: [
+            {
+              rotate: rotation.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0deg', '360deg'],
+              }),
+            },
+          ],
+        }}>
+        <MaterialIcons color={palette.text} name="sync" size={28} />
+      </Animated.View>
+    </View>
+  );
+}
+
+export const UsersList = observer(function UsersList({
+  containerStyle,
+  isLoading = false,
+  users,
+  onDeleteUser,
+}: UsersListProps) {
   const preferences = preferencesStorage.getPreferences();
   return (
     <View className="w-full self-center" style={containerStyle}>
       <View className={users.length ? 'p-5' : 'flex-grow justify-center p-5'}>
-        {users.length ? (
+        {isLoading ? (
+          <UsersLoadingSpinner />
+        ) : users.length ? (
           <AnimatePresence>
             {users.map((user, index) => (
               <UserListItem

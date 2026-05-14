@@ -20,13 +20,13 @@ const SettingsCheckbox = (
     accessibilityRole="checkbox"
     accessibilityState={{ checked: isEnabled }}
     onPress={() => enabledSetStateFn((currentValue) => !currentValue)}
-    className="flex-row items-center gap-3 rounded-lg border border-white bg-solarized-base2 p-4 active:opacity-75 dark:bg-solarized-base02"
+    className="flex-row items-start gap-3 rounded-lg border border-white bg-solarized-base2 p-4 active:opacity-75 dark:bg-solarized-base02"
   >
     <View
       className={
         isEnabled
-          ? 'h-5 w-5 items-center justify-center rounded border border-gymflow-primary bg-gymflow-primary dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark'
-          : 'h-5 w-5 rounded border border-solarized-base1 bg-solarized-base3 dark:border-solarized-base01 dark:bg-solarized-base03'
+          ? 'mt-0.5 h-5 w-5 items-center justify-center rounded border border-gymflow-primary bg-gymflow-primary dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark'
+          : 'mt-0.5 h-5 w-5 rounded border border-solarized-base1 bg-solarized-base3 dark:border-solarized-base01 dark:bg-solarized-base03'
       }>
       {isEnabled ? (
         <View style={styles.checkboxCheckmark} />

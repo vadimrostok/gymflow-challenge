@@ -88,7 +88,13 @@ function WebHeader() {
     routeTitles.keys().find(regexp => regexp.test(location.pathname)) ?? undefined as never
   ) ?? '';
 
-  return <AppHeader canGoBack={location.pathname !== '/users'} title={title} />;
+  return (
+    <AppHeader
+      canGoBack={location.pathname !== '/users'}
+      hideSettings={location.pathname === '/settings'}
+      title={title}
+    />
+  );
 }
 
 function WebEditUserScreen() {

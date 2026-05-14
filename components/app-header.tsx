@@ -9,10 +9,11 @@ import { useResolvedColorScheme } from '@/state/context/theme-mode';
 
 type AppHeaderProps = {
   canGoBack?: boolean;
+  hideSettings?: boolean;
   title: string;
 };
 
-export function AppHeader({ canGoBack = false, title }: AppHeaderProps) {
+export function AppHeader({ canGoBack = false, hideSettings = false, title }: AppHeaderProps) {
   const navigation = useAppNavigation();
   const colorScheme = useResolvedColorScheme();
   const palette = Colors[colorScheme];
@@ -49,7 +50,7 @@ export function AppHeader({ canGoBack = false, title }: AppHeaderProps) {
         </Text>
       </View>
       <View style={styles.headerRight}>
-        <HeaderActions />
+        <HeaderActions hideSettings={hideSettings} />
       </View>
     </View>
   );
