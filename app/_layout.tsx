@@ -51,7 +51,10 @@ function RootLayoutContent() {
                     accessibilityLabel="Back"
                     accessibilityRole="button"
                     onPress={() => router.back()}
-                    style={styles.headerLeftButton}>
+                    style={({ pressed }) => [
+                      styles.headerLeftButton,
+                      { opacity: pressed ? 0.7 : 1 },
+                    ]}>
                     <MaterialIcons color={palette.text} name="arrow-back" size={28} />
                   </Pressable>
                 ) : null,
@@ -107,6 +110,7 @@ function RootLayoutContent() {
 
 const styles = {
   headerLeftButton: {
+    backgroundColor: 'transparent',
     height: 44,
     marginLeft: 8,
     width: 44,

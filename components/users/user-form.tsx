@@ -4,7 +4,15 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { DateTime } from 'luxon';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { cssInterop } from 'nativewind';
-import { Modal, Platform, Pressable, TextInput, useWindowDimensions, View } from 'react-native';
+import {
+  Keyboard,
+  Modal,
+  Platform,
+  Pressable,
+  TextInput,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { useMemo, useRef, useState } from 'react';
 import DateTimePicker, {
   type CalendarDay,
@@ -80,7 +88,8 @@ function createRolePickerStyles(palette: (typeof Colors)['light'], formBorderCol
     flexDirection: 'row' as const,
     justifyContent: 'space-between' as const,
     minHeight: 48,
-    paddingHorizontal: 14,
+    paddingLeft: 14,
+    paddingRight: 22,
   };
   const modalBackdrop = {
     backgroundColor: 'rgba(0, 0, 0, 0.25)',
@@ -116,24 +125,24 @@ function parseDatePickerValue(date: DateType) {
   }
 
   if (typeof date === 'string') {
-    const parsedDate = DateTime.fromISO(date, { zone: 'utc' });
+    const parsedDate = DateTime.fromISO(date);
 
     return parsedDate.isValid ? parsedDate.toISODate() ?? '' : date;
   }
 
   if (typeof date === 'number') {
-    return DateTime.fromMillis(date, { zone: 'utc' }).toISODate() ?? '';
+    return DateTime.fromMillis(date).toISODate() ?? '';
   }
 
   if (date instanceof Date) {
-    return DateTime.fromJSDate(date, { zone: 'utc' }).toISODate() ?? '';
+    return DateTime.fromJSDate(date).toISODate() ?? '';
   }
 
   if (!('toDate' in date) || typeof date.toDate !== 'function') {
     return '';
   }
 
-  return DateTime.fromJSDate(date.toDate(), { zone: 'utc' }).toISODate() ?? '';
+  return DateTime.fromJSDate(date.toDate()).toISODate() ?? '';
 }
 
 function DatePickerDay({ day }: { day: CalendarDay }) {
@@ -213,6 +222,10 @@ function RolePicker({
   const selectedRoleLabel =
     userRoleOptions.find((option) => option.value === value)?.label ??
     (mode === 'create' ? 'Choose role' : '');
+  const closePicker = () => {
+    Keyboard.dismiss();
+    setIsPickerOpen(false);
+  };
 
   if (Platform.OS === 'ios') {
     return (
@@ -220,7 +233,10 @@ function RolePicker({
         <Pressable
           accessibilityLabel="Role"
           accessibilityRole="button"
-          onPress={() => setIsPickerOpen(true)}
+          onPress={() => {
+            Keyboard.dismiss();
+            setIsPickerOpen(true);
+          }}
           style={[rolePickerStyles.container, rolePickerStyles.compactInput]}
           testID="role-picker">
           <ThemedText
@@ -231,14 +247,19 @@ function RolePicker({
           <MaterialIcons color={palette.mutedText} name="keyboard-arrow-down" size={22} />
         </Pressable>
         <Modal animationType="slide" transparent visible={isPickerOpen}>
-          <Pressable style={rolePickerStyles.modalBackdrop} onPress={() => setIsPickerOpen(false)}>
-            <Pressable style={rolePickerStyles.modalSheet}>
+          <Pressable style={rolePickerStyles.modalBackdrop} onPress={closePicker}>
+            <View
+              onStartShouldSetResponder={() => true}
+              style={rolePickerStyles.modalSheet}>
               <View style={rolePickerStyles.modalActions}>
-                <Pressable onPress={() => setIsPickerOpen(false)}>
+                <Pressable onPress={closePicker}>
                   <ThemedText type="defaultSemiBold">Cancel</ThemedText>
                 </Pressable>
-                <Pressable onPress={() => setIsPickerOpen(false)}>
-                  <ThemedText type="defaultSemiBold" lightColor={palette.accent} darkColor={palette.accent}>
+                <Pressable onPress={closePicker}>
+                  <ThemedText
+                    type="defaultSemiBold"
+                    lightColor={palette.accent}
+                    darkColor={palette.accent}>
                     Done
                   </ThemedText>
                 </Pressable>
@@ -263,7 +284,7 @@ function RolePicker({
                   />
                 ))}
               </Picker>
-            </Pressable>
+            </View>
           </Pressable>
         </Modal>
       </>
@@ -277,7 +298,10 @@ function RolePicker({
         dropdownIconColor={palette.mutedText}
         itemStyle={{ color: palette.text, fontSize: 16 }}
         mode="dropdown"
-        onValueChange={(selectedRole) => onChange(selectedRole as UserRole | '')}
+        onValueChange={(selectedRole) => {
+          Keyboard.dismiss();
+          onChange(selectedRole as UserRole | '');
+        }}
         prompt="Role"
         selectedValue={value}
         selectionColor={palette.primaryButtonBackground}
@@ -426,8 +450,10 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
               autoCapitalize="words"
               onBlur={onBlur}
               onChangeText={onChange}
+              onSubmitEditing={Keyboard.dismiss}
               placeholder="Jane Smith"
               placeholderTextColor={palette.mutedText}
+              returnKeyType="done"
               className="min-h-12 rounded-lg border border-white bg-solarized-base2 px-3.5 text-base text-solarized-base02 dark:border-[#31565f] dark:bg-solarized-base02 dark:text-solarized-base2"
               value={value}
             />
@@ -475,7 +501,10 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
               mode="single"
               date={getDefaultDatePickerValue(value ?? '')}
               timeZone="UTC"
-              onChange={({ date }) => onChange(parseDatePickerValue(date))}
+              onChange={({ date }) => {
+                Keyboard.dismiss();
+                onChange(parseDatePickerValue(date));
+              }}
               styles={datePickerStyles}
               maxDate={now.current}
               classNames={{

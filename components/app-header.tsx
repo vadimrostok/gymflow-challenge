@@ -36,7 +36,10 @@ export function AppHeader({ canGoBack = false, hideSettings = false, title }: Ap
             accessibilityLabel="Back"
             accessibilityRole="button"
             onPress={navigation.back}
-            style={styles.headerLeftButton}>
+            style={({ pressed }) => [
+              styles.headerLeftButton,
+              { opacity: pressed ? 0.7 : 1 },
+            ]}>
             <MaterialIcons color={palette.text} name="arrow-back" size={28} />
           </Pressable>
         ) : null}

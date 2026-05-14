@@ -1,6 +1,6 @@
 import type { ComponentRef, PropsWithChildren } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, useWindowDimensions, View } from 'react-native';
+import { Image, Keyboard, useWindowDimensions, View } from 'react-native';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -116,6 +116,11 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
         initial={{ opacity: 0, y: -200 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        onStartShouldSetResponderCapture={() => {
+          Keyboard.dismiss();
+
+          return false;
+        }}
         style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', width: '100%' }}>
         {isImageVisible && painting ? (
           <AnimatedView

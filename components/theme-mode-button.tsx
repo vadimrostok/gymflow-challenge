@@ -32,7 +32,8 @@ export function ThemeModeButton() {
         accessibilityRole="checkbox"
         accessibilityState={{ checked: isAuto }}
         onPress={() => setIsAuto(!isAuto)}
-        className="min-h-10 flex-row items-center gap-1.5 rounded-md px-1 transition-colors duration-500 hover:bg-solarized-base2 active:opacity-70 dark:hover:bg-solarized-base02">
+        className="min-h-10 flex-row items-center gap-1.5 rounded-md px-1 transition-colors duration-500 hover:bg-solarized-base2 active:opacity-70 dark:hover:bg-solarized-base02"
+      >
         <View
           className={
             isAuto
