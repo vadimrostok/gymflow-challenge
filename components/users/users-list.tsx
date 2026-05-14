@@ -6,6 +6,7 @@ import { AnimatePresence } from '@/components/motion-view';
 import { ThemedText } from '@/components/themed-text';
 import { UserListItem } from '@/components/users/user-list-item';
 import type { User } from '@/state/schemas/user-schema';
+import { preferencesStorage } from '@/state/storage/preferences-storage';
 
 type UsersListProps = {
   users: User[];
@@ -14,6 +15,7 @@ type UsersListProps = {
 };
 
 export const UsersList = observer(function UsersList({ containerStyle, users, onDeleteUser }: UsersListProps) {
+  const preferences = preferencesStorage.getPreferences();
   return (
     <View className="w-full self-center" style={containerStyle}>
       <View className={users.length ? 'p-5' : 'flex-grow justify-center p-5'}>
@@ -25,6 +27,7 @@ export const UsersList = observer(function UsersList({ containerStyle, users, on
                 key={user.id}
                 onDelete={() => onDeleteUser(user)}
                 user={user}
+                showDeleteButton={preferences?.showUsersListDeleteButton ?? false}
               />
             ))}
           </AnimatePresence>

@@ -149,3 +149,4 @@
 - use `motion` for web animations
 - use react router for web routing (don't like it as react native router is fine, but that's part of the challenge description)
 - wtf MotionView is fofr?
+- add PageScrollProvider info in docs

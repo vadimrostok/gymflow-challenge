@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import { Alert, Platform, ScrollView, View } from 'react-native';
+import { Alert, Platform, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { DeleteUserDialog } from '@/components/users/delete-user-dialog';

@@ -28,7 +28,7 @@ export function AppHeader({ canGoBack = false, title }: AppHeaderProps) {
   return (
     <View
       className="min-h-[64px] flex-row items-center justify-between bg-solarized-base3 dark:bg-solarized-base03"
-      style={webColorTransition}>
+      style={[styles.headerContainer, webColorTransition]}>
       <View className="min-w-0 flex-row items-center">
         {canGoBack ? (
           <Pressable
@@ -65,6 +65,11 @@ export const headerStyles = {
   },
   headerRight: {
     paddingRight: 32,
+  },
+  headerContainer: {
+    position: Platform.OS === 'web' ? ('sticky' as const) : ('relative' as const),
+    top: 0,
+    zIndex: 10,
   },
   headerTitle: {
     fontFamily: FontFamily.bold,

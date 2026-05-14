@@ -1,9 +1,9 @@
 import type { PropsWithChildren } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
-import { motion, useScroll, useTransform } from 'motion/react';
+import { motion, useSpring, useScroll, useTransform } from 'motion/react';
 
-import { AppFooter } from '@/components/app-footer';
+import { usePageScroll } from '@/components/page-scroll-context';
 import { ThemedText } from '@/components/themed-text';
 import { getNextPainting } from '@/constants/paintings';
 
@@ -13,7 +13,7 @@ type UserFormPageShellProps = PropsWithChildren<{
 }>;
 
 export function UserFormPageShell({ children, motionKey, title }: UserFormPageShellProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const pageScroll = usePageScroll();
   const painting = useMemo(() => getNextPainting(), []);
   const [isImageVisible, setIsImageVisible] = useState(Boolean(painting));
   const { height, width } = useWindowDimensions();
@@ -27,43 +27,52 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
     maxExpandedHeaderHeight
   );
   const initialScrollOffset = isImageVisible ? expandedHeaderHeight - collapsedHeaderHeight : 0;
-  const { scrollY } = useScroll({ container: scrollRef });
-  const imageY = useTransform(scrollY, [0, expandedHeaderHeight], [0, expandedHeaderHeight * 0.45]);
+  const { scrollY } = useScroll(
+    pageScroll?.scrollRef ? { container: pageScroll.scrollRef } : undefined
+  );
+  const stiffImageY = useTransform(scrollY, [0, expandedHeaderHeight], [0, expandedHeaderHeight * 0.45]);
+  const imageY = useSpring(stiffImageY, {
+    stiffness: 100,
+    damping: 20,
+  });
 
   useEffect(() => {
     setIsImageVisible(Boolean(painting));
   }, [painting]);
 
   useEffect(() => {
-    if (!isImageVisible || initialScrollOffset <= 0 || !scrollRef.current) {
+    if (!isImageVisible || initialScrollOffset <= 0) {
       return;
     }
 
     const frameId = requestAnimationFrame(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTop = initialScrollOffset;
+      if (pageScroll?.scrollRef.current) {
+        pageScroll.scrollRef.current.scrollTop = initialScrollOffset;
+        return;
       }
+
+      window.scrollTo({ top: initialScrollOffset });
     });
 
     return () => cancelAnimationFrame(frameId);
-  }, [initialScrollOffset, isImageVisible]);
+  }, [initialScrollOffset, isImageVisible, pageScroll?.scrollRef]);
 
   function hideFailedImage() {
     setIsImageVisible(false);
 
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = 0;
+    if (pageScroll?.scrollRef.current) {
+      pageScroll.scrollRef.current.scrollTop = 0;
+      return;
     }
+
+    window.scrollTo({ top: 0 });
   }
 
   return (
     <div
-      ref={scrollRef}
       style={{
-        height: '100%',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-        scrollbarWidth: 'none',
+        minHeight: '100%',
+        width: '100%',
       }}>
       <div
         style={{
@@ -120,7 +129,6 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
             {children}
           </View>
         </motion.div>
-        <AppFooter />
       </div>
     </div>
   );

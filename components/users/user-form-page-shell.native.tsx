@@ -9,7 +9,6 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 
-import { AppFooter } from '@/components/app-footer';
 import { MotionView } from '@/components/motion-view';
 import { ThemedText } from '@/components/themed-text';
 import { getNextPainting } from '@/constants/paintings';
@@ -150,7 +149,6 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
           {children}
         </View>
       </MotionView>
-      <AppFooter />
     </AnimatedScrollView>
   );
 }

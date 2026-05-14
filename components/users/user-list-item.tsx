@@ -13,10 +13,11 @@ import type { User } from '@/state/schemas/user-schema';
 type UserListItemProps = {
   user: User;
   isLast?: boolean;
+  showDeleteButton: boolean;
   onDelete: () => void;
 };
 
-export function UserListItem({ user, isLast = false, onDelete }: UserListItemProps) {
+export function UserListItem({ user, isLast = false, showDeleteButton, onDelete }: UserListItemProps) {
   const navigation = useAppNavigation();
   const [isDeleteTooltipVisible, setIsDeleteTooltipVisible] = useState(false);
   const birthdayLabel = formatUserBirthday(user.dateOfBirth);
@@ -65,37 +66,40 @@ export function UserListItem({ user, isLast = false, onDelete }: UserListItemPro
             {birthdayLabel}
           </ThemedText>
         </Pressable>
-        <Pressable
-          accessibilityLabel={`Remove ${user.fullName}`}
-          accessibilityHint="Delete user"
-          accessibilityRole="button"
-          hitSlop={6}
-          onBlur={() => setIsDeleteTooltipVisible(false)}
-          onPress={onDelete}
-          onFocus={() => setIsDeleteTooltipVisible(true)}
-          onHoverIn={() => setIsDeleteTooltipVisible(true)}
-          onHoverOut={() => setIsDeleteTooltipVisible(false)}
-          className="absolute right-3.5 top-1/2 h-10 w-10 items-center justify-center rounded-full border border-solarized-red bg-solarized-red hover:border-[#b91c1c] hover:bg-[#b91c1c] active:opacity-70"
-          style={{ transform: [{ translateY: -20 }] }}>
-          <MaterialIcons color="#ffffff" name="delete-outline" size={20} />
-          <AnimatePresence>
-            {isDeleteTooltipVisible ? (
-              <MotionView
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="absolute right-[48px] top-1/2 w-24 -translate-y-1/2 rounded-md bg-solarized-base02 px-2 py-1.5 dark:bg-solarized-base2">
-                <ThemedText
-                  lightColor="#fdf6e3"
-                  darkColor="#002b36"
-                  className="text-center text-xs leading-[14px]">
-                  Delete user
-                </ThemedText>
-              </MotionView>
-            ) : null}
-          </AnimatePresence>
-        </Pressable>
+        {showDeleteButton && (
+          <Pressable
+            accessibilityLabel={`Remove ${user.fullName}`}
+            accessibilityHint="Delete user"
+            accessibilityRole="button"
+            hitSlop={6}
+            onBlur={() => setIsDeleteTooltipVisible(false)}
+            onPress={onDelete}
+            onFocus={() => setIsDeleteTooltipVisible(true)}
+            onHoverIn={() => setIsDeleteTooltipVisible(true)}
+            onHoverOut={() => setIsDeleteTooltipVisible(false)}
+            className="absolute right-3.5 top-1/2 h-10 w-10 items-center justify-center rounded-full border border-solarized-red bg-solarized-red hover:border-[#b91c1c] hover:bg-[#b91c1c] active:opacity-70"
+            style={{ transform: [{ translateY: -20 }] }}>
+            <MaterialIcons color="#ffffff" name="delete-outline" size={20} />
+            <AnimatePresence>
+              {isDeleteTooltipVisible ? (
+                <MotionView
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute right-[48px] top-1/2 w-24 -translate-y-1/2 rounded-md bg-solarized-base02 px-2 py-1.5 dark:bg-solarized-base2">
+                  <ThemedText
+                    lightColor="#fdf6e3"
+                    darkColor="#002b36"
+                    className="text-center text-xs leading-[14px]">
+                    Delete user
+                  </ThemedText>
+                </MotionView>
+              ) : null}
+            </AnimatePresence>
+          </Pressable>
+        )}
+
       </View>
     </MotionView>
   );

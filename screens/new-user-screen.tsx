@@ -1,4 +1,4 @@
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 
 import { UserForm } from '@/components/users/user-form';
 import { useAppNavigation } from '@/navigation/use-app-navigation';
