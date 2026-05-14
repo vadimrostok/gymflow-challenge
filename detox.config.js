@@ -1,6 +1,15 @@
 const path = require('node:path');
 
 const iosAppName = 'gymflowchallenge';
+const iosSimulatorDevice = process.env.DETOX_SIMULATOR_ID
+  ? { id: process.env.DETOX_SIMULATOR_ID }
+  : process.env.DETOX_SIMULATOR_TYPE
+    ? { type: process.env.DETOX_SIMULATOR_TYPE }
+  : {
+      id: '8458022A-8E39-411A-9F75-9C6B510D425E',
+      type: 'iPhone 17 Pro',
+      os: 'iOS 26.4',
+    };
 const iosBuildPath = path.join(
   'ios',
   'build',
@@ -45,11 +54,7 @@ module.exports = {
   devices: {
     simulator: {
       type: 'ios.simulator',
-      device: {
-        "id": "8458022A-8E39-411A-9F75-9C6B510D425E",
-        "type": "iPhone 17 Pro",
-        "os": "iOS 26.4"
-      },
+      device: iosSimulatorDevice,
     },
   },
   configurations: {
