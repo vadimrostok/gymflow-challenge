@@ -1,8 +1,9 @@
 import type { ViewStyle } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useRef } from 'react';
-import { Animated, Easing, View } from 'react-native';
+import { useEffect } from 'react';
+import { View } from 'react-native';
+import Animated, { Easing, cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 
 import { AnimatePresence } from '@/components/motion-view';
 import { ThemedText } from '@/components/themed-text';
@@ -22,36 +23,31 @@ type UsersListProps = {
 function UsersLoadingSpinner() {
   const colorScheme = useResolvedColorScheme();
   const palette = Colors[colorScheme];
-  const rotation = useRef(new Animated.Value(0)).current;
+  const rotation = useSharedValue(0);
+  const spinnerStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
 
   useEffect(() => {
-    const animation = Animated.loop(
-      Animated.timing(rotation, {
+    rotation.value = withRepeat(
+      withTiming(360, {
         duration: 900,
         easing: Easing.linear,
-        toValue: 1,
-        useNativeDriver: true,
-      })
+      }),
+      -1,
+      false
     );
 
-    animation.start();
-
-    return () => animation.stop();
+    return () => {
+      cancelAnimation(rotation);
+      rotation.value = 0;
+    };
   }, [rotation]);
 
   return (
     <View accessibilityLabel="Loading users" className="items-center justify-center py-12">
       <Animated.View
-        style={{
-          transform: [
-            {
-              rotate: rotation.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0deg', '360deg'],
-              }),
-            },
-          ],
-        }}>
+        style={spinnerStyle}>
         <MaterialIcons color={palette.text} name="sync" size={28} />
       </Animated.View>
     </View>
