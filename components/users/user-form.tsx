@@ -37,7 +37,7 @@ cssInterop(DateTimePicker, { className: 'style' });
 type UserFormProps = {
   mode: 'create' | 'edit';
   initialUser?: User;
-  onSubmit: (values: UserFormValues) => void;
+  onSubmit: (values: UserFormValues) => Promise<void> | void;
   onCancel: () => void;
   onDelete?: () => void;
 };

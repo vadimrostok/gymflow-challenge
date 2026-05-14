@@ -1,14 +1,16 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import { Alert, Platform, ScrollView, View } from 'react-native';
+import { Alert, Platform, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { DeleteUserDialog } from '@/components/users/delete-user-dialog';
 import { UserForm } from '@/components/users/user-form';
+import { UserFormPageShell } from '@/components/users/user-form-page-shell';
+import { UsersSyncError } from '@/components/users/users-sync-error';
 import { useAppNavigation } from '@/navigation/use-app-navigation';
+import { useScreenFocusEffect } from '@/navigation/use-screen-focus-effect';
 import { useUsersStore } from '@/state/context/users-context';
 import type { UserFormValues } from '@/state/schemas/user-schema';
-import { UserFormPageShell } from '@/components/users/user-form-page-shell';
 
 type EditUserScreenProps = {
   userId?: string;
@@ -20,9 +22,14 @@ export const EditUserScreen = observer(function EditUserScreen({ userId }: EditU
   const user = userId ? usersStore.findUser(userId) : undefined;
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
 
+  useScreenFocusEffect(() => {
+    void usersStore.loadUsers();
+  });
+
   if (!user) {
     return (
-      <View className="flex-1 items-center justify-center bg-solarized-base3 p-5 dark:bg-solarized-base03">
+      <View className="flex-1 items-center justify-center gap-3 bg-solarized-base3 p-5 dark:bg-solarized-base03">
+        <UsersSyncError />
         <ThemedText type="subtitle">User not found</ThemedText>
         <ThemedText className="text-solarized-base01 dark:text-solarized-base1">
           This profile may have already been removed.
@@ -33,13 +40,13 @@ export const EditUserScreen = observer(function EditUserScreen({ userId }: EditU
 
   const existingUser = user;
 
-  function saveUser(values: UserFormValues) {
-    usersStore.updateUser(existingUser.id, values);
+  async function saveUser(values: UserFormValues) {
+    await usersStore.updateUser(existingUser.id, values);
     navigation.toUsers();
   }
 
-  function deleteUser() {
-    usersStore.deleteUser(existingUser.id);
+  async function deleteUser() {
+    await usersStore.deleteUser(existingUser.id);
     navigation.toUsers();
   }
 
@@ -58,6 +65,7 @@ export const EditUserScreen = observer(function EditUserScreen({ userId }: EditU
   return (
     <View className="flex-1 bg-solarized-base3 transition-colors duration-500 dark:bg-solarized-base03">
       <UserFormPageShell motionKey={`users-edit-enter-${existingUser.id}`} title="Edit User">
+        <UsersSyncError />
         <UserForm
           initialUser={existingUser}
           mode="edit"

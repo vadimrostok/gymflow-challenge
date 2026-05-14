@@ -7,9 +7,11 @@ import { AppFooter } from '@/components/app-footer';
 import { MotionView } from '@/components/motion-view';
 import { ThemedText } from '@/components/themed-text';
 import { DeleteUserDialog } from '@/components/users/delete-user-dialog';
+import { UsersSyncError } from '@/components/users/users-sync-error';
 import { UsersList } from '@/components/users/users-list';
 import { USER_SCREEN_MAX_WIDTH } from '@/constants/layout';
 import { useAppNavigation } from '@/navigation/use-app-navigation';
+import { useScreenFocusEffect } from '@/navigation/use-screen-focus-effect';
 import { useUsersStore } from '@/state/context/users-context';
 import type { User } from '@/state/schemas/user-schema';
 
@@ -17,6 +19,10 @@ export const UsersScreen = observer(function UsersScreen() {
   const navigation = useAppNavigation();
   const usersStore = useUsersStore();
   const [pendingDeleteUser, setPendingDeleteUser] = useState<User | undefined>();
+
+  useScreenFocusEffect(() => {
+    void usersStore.loadUsers();
+  });
 
   function requestDeleteUser(user: User) {
     const deleteUser = () => usersStore.deleteUser(user.id);
@@ -71,6 +77,7 @@ export const UsersScreen = observer(function UsersScreen() {
                 </View>
               </Pressable>
             </View>
+            <UsersSyncError containerClassName="mx-5 mt-3" />
             <UsersList
               containerStyle={{ maxWidth: USER_SCREEN_MAX_WIDTH }}
               onDeleteUser={requestDeleteUser}
