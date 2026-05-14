@@ -1,12 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView, View } from 'react-native';
 
 import { MotionView } from '@/components/motion-view';
 import { ThemedText } from '@/components/themed-text';
 import { DeleteUserDialog } from '@/components/users/delete-user-dialog';
-import { UsersSyncError } from '@/components/users/users-sync-error';
 import { UsersList } from '@/components/users/users-list';
 import { USER_SCREEN_MAX_WIDTH } from '@/constants/layout';
 import { Colors, SharedColors } from '@/constants/theme';
@@ -15,6 +14,7 @@ import { useScreenFocusEffect } from '@/navigation/use-screen-focus-effect';
 import { useUsersStore } from '@/state/context/users-context';
 import type { User } from '@/state/schemas/user-schema';
 import { preferencesStorage } from '@/state/storage/preferences-storage';
+import { ScreenWithFooter } from '@/components/screen-with-footer';
 
 export const UsersScreen = observer(function UsersScreen() {
   const navigation = useAppNavigation();
@@ -75,7 +75,12 @@ export const UsersScreen = observer(function UsersScreen() {
               className="leading-5">
               Add User
             </ThemedText>
-            <View className="h-10 w-10 items-center justify-center rounded-full border border-gymflow-primary bg-gymflow-primary hover:border-gymflow-primaryHover hover:bg-gymflow-primaryHover dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark dark:hover:border-gymflow-primaryHoverDark dark:hover:bg-gymflow-primaryHoverDark">
+            <View
+              className="h-10 w-10 items-center justify-center rounded-full border border-gymflow-primary bg-gymflow-primary hover:border-gymflow-primaryHover hover:bg-gymflow-primaryHover dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark dark:hover:border-gymflow-primaryHoverDark dark:hover:bg-gymflow-primaryHoverDark"
+              /* Without pointerEvents=none clicking on the icon (or anything inside
+               * this view) would not trigger parent pressable's handler */
+              pointerEvents="none"
+            >
               <MaterialIcons name="person-add-alt-1" size={20} color={SharedColors.white} />
             </View>
           </Pressable>
@@ -96,13 +101,9 @@ export const UsersScreen = observer(function UsersScreen() {
       {Platform.OS === 'web' ? (
         content
       ) : (
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="always"
-          showsVerticalScrollIndicator={false}>
+        <ScreenWithFooter>
           {content}
-        </ScrollView>
+        </ScreenWithFooter>
       )}
       <DeleteUserDialog
         isVisible={Boolean(pendingDeleteUser)}

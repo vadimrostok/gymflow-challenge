@@ -1,11 +1,10 @@
-import { View } from 'react-native';
-
 import { UserForm } from '@/components/users/user-form';
 import { UserFormPageShell } from '@/components/users/user-form-page-shell';
 import { UsersSyncError } from '@/components/users/users-sync-error';
 import { useAppNavigation } from '@/navigation/use-app-navigation';
 import { useUsersStore } from '@/state/context/users-context';
 import type { UserFormValues } from '@/state/schemas/user-schema';
+import { View } from 'react-native';
 
 export function NewUserScreen() {
   const navigation = useAppNavigation();

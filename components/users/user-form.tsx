@@ -74,6 +74,7 @@ const emptyUserFormValues: UserFormValues = {
   dateOfBirth: '',
 };
 const nativePickerContentPointerEvents = Platform.OS === 'web' ? undefined : ('none' as const);
+const isWeb = Platform.OS === 'web';
 
 function createRolePickerStyles(palette: ThemePalette, formBorderColor: string) {
   const container = {
@@ -469,12 +470,39 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
     [datePickerEmphasisColor, datePickerSelectorBackground, defaultDatePickerStyles, palette]
   );
   const datePickerComponents = useMemo(
-    () => ({
+    () => isWeb ? ({
       Day: (day: CalendarDay) => <DatePickerDay day={day} />,
       Month: (month: CalendarMonth) => <DatePickerMonth month={month} />,
       Year: (year: CalendarYear) => <DatePickerYear year={year} />,
-    }),
+    }) : undefined,
     []
+  );
+  const datePickerClassNames = useMemo(
+    () => isWeb ? ({
+      ...defaultClassNames,
+      day: `${defaultClassNames.day} hover:bg-gymflow-primary/10 dark:hover:bg-gymflow-primaryDark/15`,
+      day_label: `${defaultClassNames.day_label} text-solarized-base02 dark:text-solarized-base2`,
+      disabled: 'opacity-40',
+      disabled_label: 'text-solarized-base1 dark:text-solarized-base01',
+      month_label: 'font-semibold',
+      month_selector: 'mr-2 rounded-lg bg-gymflow-selector px-2.5 py-1 hover:bg-gymflow-selectorHover dark:bg-gymflow-selectorDark dark:hover:bg-gymflow-mutedHoverDark',
+      month_selector_label: 'text-xl font-bold',
+      outside_label: 'text-solarized-base1 dark:text-solarized-base01',
+      selected: 'border-gymflow-primary bg-gymflow-primary dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark',
+      selected_label: 'font-bold',
+      selected_month_label: 'font-bold',
+      selected_year_label: 'font-bold',
+      time_label: 'text-solarized-base02 dark:text-solarized-base2',
+      time_selected_indicator: 'bg-solarized-base2 dark:bg-solarized-base02',
+      today: 'border-solarized-yellow bg-gymflow-today dark:bg-solarized-yellow/20',
+      today_label: 'text-solarized-yellow',
+      weekday_label: 'text-sm uppercase text-solarized-base01 dark:text-solarized-base1',
+      year_label: 'font-semibold',
+      year_selector: 'rounded-lg bg-gymflow-selector px-2.5 py-1 hover:bg-gymflow-selectorHover dark:bg-gymflow-selectorDark dark:hover:bg-gymflow-mutedHoverDark',
+      year_selector_label: 'text-xl font-bold',
+      active_year_label: 'font-semibold',
+    }) : defaultClassNames,
+    [defaultClassNames]
   );
   const isFormValid = userFormSchema.safeParse({
     fullName: fullNameValue,
@@ -571,30 +599,7 @@ export function UserForm({ mode, initialUser, onSubmit, onCancel, onDelete }: Us
               }}
               styles={datePickerStyles}
               maxDate={now.current}
-              classNames={{
-                ...defaultClassNames,
-                day: `${defaultClassNames.day} hover:bg-gymflow-primary/10 dark:hover:bg-gymflow-primaryDark/15`,
-                day_label: `${defaultClassNames.day_label} text-solarized-base02 dark:text-solarized-base2`,
-                disabled: 'opacity-40',
-                disabled_label: 'text-solarized-base1 dark:text-solarized-base01',
-                month_label: 'font-semibold',
-                month_selector: 'mr-2 rounded-lg bg-gymflow-selector px-2.5 py-1 hover:bg-gymflow-selectorHover dark:bg-gymflow-selectorDark dark:hover:bg-gymflow-mutedHoverDark',
-                month_selector_label: 'text-xl font-bold',
-                outside_label: 'text-solarized-base1 dark:text-solarized-base01',
-                selected: 'border-gymflow-primary bg-gymflow-primary dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark',
-                selected_label: 'font-bold',
-                selected_month_label: 'font-bold',
-                selected_year_label: 'font-bold',
-                time_label: 'text-solarized-base02 dark:text-solarized-base2',
-                time_selected_indicator: 'bg-solarized-base2 dark:bg-solarized-base02',
-                today: 'border-solarized-yellow bg-gymflow-today dark:bg-solarized-yellow/20',
-                today_label: 'text-solarized-yellow',
-                weekday_label: 'text-sm uppercase text-solarized-base01 dark:text-solarized-base1',
-                year_label: 'font-semibold',
-                year_selector: 'rounded-lg bg-gymflow-selector px-2.5 py-1 hover:bg-gymflow-selectorHover dark:bg-gymflow-selectorDark dark:hover:bg-gymflow-mutedHoverDark',
-                year_selector_label: 'text-xl font-bold',
-                active_year_label: 'font-semibold',
-              }}
+              classNames={datePickerClassNames}
             />
           )}
         />

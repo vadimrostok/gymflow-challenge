@@ -5,6 +5,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Colors, SharedColors } from '@/constants/theme';
 import { useThemeMode } from '@/state/context/theme-mode';
 import { preferencesStorage } from '@/state/storage/preferences-storage';
+import { ScreenWithFooter } from '@/components/screen-with-footer';
 
 type SettingsCheckboxProps = {
   testID: string;
@@ -69,7 +70,7 @@ export function SettingsScreen(): ReactElement {
 
   return (
     <View className="flex-1 bg-solarized-base3 dark:bg-solarized-base03">
-      <View className="w-full max-w-[860px] self-center gap-6 p-5">
+      <ScreenWithFooter className="w-full max-w-[860px] self-center gap-6 p-5">
         <View className="gap-2">
           <ThemedText type="title">Settings</ThemedText>
           <ThemedText lightColor={Colors.light.mutedText} darkColor={Colors.dark.mutedText}>
@@ -94,7 +95,7 @@ export function SettingsScreen(): ReactElement {
           label="Deletable user list items"
           description="Show delete button on users list"
         />
-      </View>
+      </ScreenWithFooter>
     </View>
   );
 }

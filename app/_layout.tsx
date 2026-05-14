@@ -6,7 +6,6 @@ import { Platform, Pressable, Text, View } from 'react-native';
 import 'react-native-reanimated';
 import '../global.css';
 
-import { AppFooter } from '@/components/app-footer';
 import { HeaderActions } from '@/components/header-actions';
 import { AppProviders } from '@/components/app-providers';
 import { FontFamily } from '@/constants/fonts';
@@ -105,7 +104,6 @@ function RootLayoutContent() {
             />
           </Stack>
         </View>
-        <AppFooter />
       </View>
       <StatusBar style="auto" />
     </ThemeProvider>

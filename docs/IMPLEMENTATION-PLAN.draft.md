@@ -160,4 +160,4 @@
 - gh pages deployment
 - auto-tests action
 - sonar/copilot
-- 
+- explain why ScreenWithFooter was needed (damn stack) 
