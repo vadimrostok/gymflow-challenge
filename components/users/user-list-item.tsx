@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
 import { MaterialIcons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
 import { AnimatePresence, MotionView } from '@/components/motion-view';
 import { ThemedText } from '@/components/themed-text';
 import { formatUserBirthday } from '@/components/users/format-user-birthday';
 import { FontFamily } from '@/constants/fonts';
+import { useAppNavigation } from '@/navigation/use-app-navigation';
 import type { User } from '@/state/schemas/user-schema';
 
 type UserListItemProps = {
@@ -17,6 +17,7 @@ type UserListItemProps = {
 };
 
 export function UserListItem({ user, isLast = false, onDelete }: UserListItemProps) {
+  const navigation = useAppNavigation();
   const [isDeleteTooltipVisible, setIsDeleteTooltipVisible] = useState(false);
   const birthdayLabel = formatUserBirthday(user.dateOfBirth);
 
@@ -38,33 +39,32 @@ export function UserListItem({ user, isLast = false, onDelete }: UserListItemPro
       transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
       style={{ overflow: 'visible' }}>
       <View className="relative w-full rounded-lg">
-        <Link href={`/users/${user.id}`} asChild>
-          <Pressable
-            accessibilityRole="link"
-            className="min-h-[86px] w-full justify-center gap-1.5 rounded-lg border border-white bg-solarized-base2 py-3.5 pl-3.5 pr-[70px] transition-colors duration-500 active:opacity-80 dark:border-[#31565f] dark:bg-solarized-base02">
-            <View className="flex-row flex-wrap items-center gap-2">
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => navigation.toEditUser(user.id)}
+          className="min-h-[86px] w-full justify-center gap-1.5 rounded-lg border border-white bg-solarized-base2 py-3.5 pl-3.5 pr-[70px] transition-colors duration-500 active:opacity-80 dark:border-[#31565f] dark:bg-solarized-base02">
+          <View className="flex-row flex-wrap items-center gap-2">
+            <ThemedText
+              type="defaultSemiBold"
+              className="shrink leading-[22px]"
+              style={{ fontFamily: FontFamily.bold }}>
+              {user.fullName}
+            </ThemedText>
+            <View className="rounded-lg bg-[#f4e7b5] px-2.5 py-1 dark:bg-[#3a3f2c]">
               <ThemedText
                 type="defaultSemiBold"
-                className="shrink leading-[22px]"
-                style={{ fontFamily: FontFamily.bold }}>
-                {user.fullName}
+                lightColor="#b58900"
+                darkColor="#b58900"
+                className="text-[13px] leading-4 text-solarized-yellow"
+                style={{ fontFamily: FontFamily.italic }}>
+                {user.role === 'STAFF' ? 'Staff' : 'Member'}
               </ThemedText>
-              <View className="rounded-lg bg-[#f4e7b5] px-2.5 py-1 dark:bg-[#3a3f2c]">
-                <ThemedText
-                  type="defaultSemiBold"
-                  lightColor="#b58900"
-                  darkColor="#b58900"
-                  className="text-[13px] leading-4 text-solarized-yellow"
-                  style={{ fontFamily: FontFamily.italic }}>
-                  {user.role === 'STAFF' ? 'Staff' : 'Member'}
-                </ThemedText>
-              </View>
             </View>
-            <ThemedText lightColor="#586e75" darkColor="#93a1a1">
-              {birthdayLabel}
-            </ThemedText>
-          </Pressable>
-        </Link>
+          </View>
+          <ThemedText lightColor="#586e75" darkColor="#93a1a1">
+            {birthdayLabel}
+          </ThemedText>
+        </Pressable>
         <Pressable
           accessibilityLabel={`Remove ${user.fullName}`}
           accessibilityHint="Delete user"

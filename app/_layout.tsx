@@ -1,6 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, Pressable, Text, View } from 'react-native';
@@ -8,30 +7,20 @@ import 'react-native-reanimated';
 import '../global.css';
 
 import { HeaderActions } from '@/components/header-actions';
-//import { RouteAwareBackButton } from '@/components/navigation/route-aware-back';
-import { FontFamily, fontAssets } from '@/constants/fonts';
+import { AppProviders } from '@/components/app-providers';
+import { FontFamily } from '@/constants/fonts';
 import { Colors } from '@/constants/theme';
-import { ThemeModeProvider, useResolvedColorScheme } from '@/state/context/theme-mode';
-import { StoresProvider } from '@/state/context/users-context';
+import { useResolvedColorScheme } from '@/state/context/theme-mode';
 
 export const unstable_settings = {
-  // Ensure any route can link back to `/users`
   initialRouteName: 'users/index',
 };
 
 export default function RootLayout() {
-  const [areFontsLoaded] = useFonts(fontAssets);
-
-  if (!areFontsLoaded) {
-    return null;
-  }
-
   return (
-    <ThemeModeProvider>
-      <StoresProvider>
-        <RootLayoutContent />
-      </StoresProvider>
-    </ThemeModeProvider>
+    <AppProviders>
+      <RootLayoutContent />
+    </AppProviders>
   );
 }
 
@@ -71,7 +60,12 @@ function RootLayoutContent() {
           headerShadowVisible: false,
           headerStyle: { backgroundColor: palette.background, ...webColorTransition },
           headerTitle: ({ children, tintColor }) => (
-            <Text style={[styles.headerTitle, { color: tintColor ?? palette.text }, webColorTransition]}>
+            <Text
+              style={[
+                styles.headerTitle,
+                { color: tintColor ?? palette.text },
+                webColorTransition,
+              ]}>
               {children}
             </Text>
           ),
