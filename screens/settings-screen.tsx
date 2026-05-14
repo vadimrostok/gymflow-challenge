@@ -9,11 +9,11 @@ type SettingsCheckboxProps = {
   isEnabled: boolean;
   enabledSetStateFn: (changeFn: (currentIsEnabled: boolean) => boolean) => void;
   accessibilityLabel: string;
-  title: string;
+  label: string;
   description: string;
 }
 const SettingsCheckbox = (
-  { isEnabled, enabledSetStateFn, accessibilityLabel, title, description } : SettingsCheckboxProps
+  { isEnabled, enabledSetStateFn, accessibilityLabel, label, description } : SettingsCheckboxProps
 ): ReactElement => (
   <Pressable
     accessibilityLabel={accessibilityLabel}
@@ -29,13 +29,11 @@ const SettingsCheckbox = (
           : 'h-5 w-5 rounded border border-solarized-base1 bg-solarized-base3 dark:border-solarized-base01 dark:bg-solarized-base03'
       }>
       {isEnabled ? (
-        <ThemedText lightColor="#ffffff" darkColor="#002b36" className="text-sm leading-4">
-          ✓
-        </ThemedText>
+        <View style={styles.checkboxCheckmark} />
       ) : null}
     </View>
     <View className="flex-1 gap-1">
-      <ThemedText type="defaultSemiBold">{<title></title>}</ThemedText>
+      <ThemedText type="defaultSemiBold">{label}</ThemedText>
       <ThemedText lightColor="#586e75" darkColor="#93a1a1" className="text-sm leading-5">
         {description}
       </ThemedText>
@@ -80,7 +78,7 @@ export function SettingsScreen(): ReactElement {
           isEnabled={isSecureModeEnabled}
           enabledSetStateFn={setIsSecureModeEnabled}
           accessibilityLabel="Secure mode"
-          title="Secure mode"
+          label="Secure mode"
           description="Toggle for the biometric/app-lock behaviour"
         />}
 
@@ -88,10 +86,23 @@ export function SettingsScreen(): ReactElement {
           isEnabled={showUsersListDeleteButton}
           enabledSetStateFn={setShowUsersListDeleteButton}
           accessibilityLabel="Show delete button on users list"
-          title="Secure mode"
+          label="Deletable user list items"
           description="Show delete button on users list"
         />
       </View>
     </View>
   );
 }
+
+const styles = {
+  checkboxCheckmark: {
+    borderBottomColor: '#ffffff',
+    borderBottomWidth: 3,
+    borderRightColor: '#ffffff',
+    borderRightWidth: 3,
+    height: 12,
+    marginTop: -2,
+    transform: [{ rotate: '45deg' }],
+    width: 7,
+  },
+};

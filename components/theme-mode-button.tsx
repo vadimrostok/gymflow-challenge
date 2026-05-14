@@ -40,13 +40,14 @@ export function ThemeModeButton() {
               : 'h-[18px] w-[18px] items-center justify-center rounded border border-solarized-base1 bg-solarized-base2 transition-colors duration-500 dark:border-solarized-base01 dark:bg-solarized-base02'
           }>
           {isAuto ? (
-            <ThemedText
+            <View style={styles.checkboxCheckmark} />
+            /*<ThemedText
               type="defaultSemiBold"
               lightColor="#ffffff"
               darkColor="#002b36"
               className="text-sm leading-4 text-white dark:text-solarized-base03">
               ✓
-            </ThemedText>
+            </ThemedText>*/
           ) : null}
         </View>
         <ThemedText type="defaultSemiBold" className="text-sm leading-[18px]">
@@ -77,3 +78,16 @@ export function ThemeModeButton() {
     </View>
   );
 }
+
+const styles = {
+  checkboxCheckmark: {
+    borderBottomColor: '#ffffff',
+    borderBottomWidth: 3,
+    borderRightColor: '#ffffff',
+    borderRightWidth: 3,
+    height: 12,
+    marginTop: -2,
+    transform: [{ rotate: '45deg' }],
+    width: 7,
+  },
+};

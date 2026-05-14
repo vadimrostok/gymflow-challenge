@@ -150,3 +150,9 @@
 - use react router for web routing (don't like it as react native router is fine, but that's part of the challenge description)
 - wtf MotionView is fofr?
 - add PageScrollProvider info in docs
+- block save button when form is invalid
+- loading spinners
+- when we go from settings page to settings page, we should not push to history
+- alight checkboxes higher in settings
+- back button ui is off on ios
+- move page title left-er on ios

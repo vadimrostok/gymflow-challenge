@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  a[href],
+  button:not(:disabled),
+  select,
+  [role='button']:not([aria-disabled='true']),
+  [role='checkbox']:not([aria-disabled='true']),
+  [role='link']:not([aria-disabled='true']) {
+    cursor: pointer !important;
+  }
+
+  button:disabled,
+  [aria-disabled='true'] {
+    cursor: default !important;
+  }
+}
