@@ -81,7 +81,14 @@ function RootLayoutContent() {
               headerTintColor: palette.text,
             }}>
             <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="users/index" options={{ title: 'Home' }} />
+            <Stack.Screen
+              name="users/index"
+              options={{
+                headerBackVisible: false,
+                headerLeft: () => null,
+                title: 'Home',
+              }}
+            />
             <Stack.Screen
               name="users/new"
               options={{ headerBackTitle: 'Users', title: 'New User' }}

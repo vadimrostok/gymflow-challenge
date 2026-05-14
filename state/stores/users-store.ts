@@ -122,7 +122,7 @@ export class UsersStore {
   private usersLoadingTimeout: ReturnType<typeof setTimeout> | undefined;
   private usersLoadRequestId = 0;
 
-  users: User[] = observable(initialUsers);
+  users: User[] = initialUsers;
   isLoadingUsers = false;
   syncErrorMessage = '';
 

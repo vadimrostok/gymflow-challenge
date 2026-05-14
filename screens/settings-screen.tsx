@@ -78,14 +78,15 @@ export function SettingsScreen(): ReactElement {
           </ThemedText>
         </View>
 
-        {Platform.OS !== 'web' && <SettingsCheckbox
+        {/* // to bo done in future, maybe: */}
+        {/*{Platform.OS !== 'web' && <SettingsCheckbox
           testID="settings-secure-mode-toggle"
           isEnabled={isSecureModeEnabled}
           enabledSetStateFn={setIsSecureModeEnabled}
           accessibilityLabel="Secure mode"
           label="Secure mode"
           description="Toggle for the biometric/app-lock behaviour"
-        />}
+        />}*/}
 
         <SettingsCheckbox
           testID="users-list-delete-toggle"
