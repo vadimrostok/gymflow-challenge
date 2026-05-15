@@ -8,6 +8,7 @@ import '../global.css';
 
 import { HeaderActions } from '@/components/header-actions';
 import { AppProviders } from '@/components/app-providers';
+import { ForegroundResumeAnimation } from '@/components/foreground-resume-animation';
 import { FontFamily } from '@/constants/fonts';
 import { Colors, SharedColors } from '@/constants/theme';
 import { useResolvedColorScheme } from '@/state/context/theme-mode';
@@ -40,81 +41,83 @@ function RootLayoutContent() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AppLock>
-        <View style={{ backgroundColor: palette.background, flex: 1, ...webColorTransition }}>
-          <View style={{ flexGrow: 1, flexShrink: 0 }}>
-            <Stack
-              screenOptions={{
-                contentStyle: { backgroundColor: palette.background, ...webColorTransition },
-                headerLeft: ({ canGoBack }) =>
-                  canGoBack ? (
-                    <Pressable
-                      testID="app-header-back"
-                      accessibilityLabel="Back"
-                      accessibilityRole="button"
-                      onPress={() => router.back()}
-                      style={({ pressed }) => [
-                        styles.headerLeftButton,
-                        { opacity: pressed ? 0.7 : 1 },
-                      ]}>
-                      <MaterialIcons style={{ marginLeft: 4 }} color={palette.text} name="arrow-back" size={28} />
-                    </Pressable>
-                  ) : null,
-                headerRight: () => (
-                  <View style={styles.headerRight}>
-                    <HeaderActions />
-                  </View>
-                ),
-                headerShadowVisible: false,
-                headerStyle: {
-                  backgroundColor: palette.background,
-                  ...webColorTransition,
-                },
-                headerTitle: ({ children, tintColor }) => (
-                  <Text
-                    style={[
-                      styles.headerTitle,
-                      { color: tintColor ?? palette.text },
-                      webColorTransition
-                    ]}>
-                    {children}
-                  </Text>
-                ),
-                headerTintColor: palette.text,
-              }}>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="users/index"
-                options={{
-                  headerBackVisible: false,
-                  headerLeft: () => null,
-                  title: 'Home',
-                }}
-              />
-              <Stack.Screen
-                name="users/new"
-                options={{ headerBackTitle: 'Users', title: 'New User' }}
-              />
-              <Stack.Screen
-                name="users/[id]"
-                options={{ headerBackTitle: 'Users', title: 'Edit User' }}
-              />
-              <Stack.Screen
-                name="settings"
-                options={{
-                  headerBackTitle: 'Users',
+      <ForegroundResumeAnimation>
+        <AppLock>
+          <View style={{ backgroundColor: palette.background, flex: 1, ...webColorTransition }}>
+            <View style={{ flexGrow: 1, flexShrink: 0 }}>
+              <Stack
+                screenOptions={{
+                  contentStyle: { backgroundColor: palette.background, ...webColorTransition },
+                  headerLeft: ({ canGoBack }) =>
+                    canGoBack ? (
+                      <Pressable
+                        testID="app-header-back"
+                        accessibilityLabel="Back"
+                        accessibilityRole="button"
+                        onPress={() => router.back()}
+                        style={({ pressed }) => [
+                          styles.headerLeftButton,
+                          { opacity: pressed ? 0.7 : 1 },
+                        ]}>
+                        <MaterialIcons style={{ marginLeft: 4 }} color={palette.text} name="arrow-back" size={28} />
+                      </Pressable>
+                    ) : null,
                   headerRight: () => (
                     <View style={styles.headerRight}>
-                      <HeaderActions hideSettings />
+                      <HeaderActions />
                     </View>
                   ),
-                  title: 'Settings',
-                }}
-              />
-            </Stack>
+                  headerShadowVisible: false,
+                  headerStyle: {
+                    backgroundColor: palette.background,
+                    ...webColorTransition,
+                  },
+                  headerTitle: ({ children, tintColor }) => (
+                    <Text
+                      style={[
+                        styles.headerTitle,
+                        { color: tintColor ?? palette.text },
+                        webColorTransition
+                      ]}>
+                      {children}
+                    </Text>
+                  ),
+                  headerTintColor: palette.text,
+                }}>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="users/index"
+                  options={{
+                    headerBackVisible: false,
+                    headerLeft: () => null,
+                    title: 'Home',
+                  }}
+                />
+                <Stack.Screen
+                  name="users/new"
+                  options={{ headerBackTitle: 'Users', title: 'New User' }}
+                />
+                <Stack.Screen
+                  name="users/[id]"
+                  options={{ headerBackTitle: 'Users', title: 'Edit User' }}
+                />
+                <Stack.Screen
+                  name="settings"
+                  options={{
+                    headerBackTitle: 'Users',
+                    headerRight: () => (
+                      <View style={styles.headerRight}>
+                        <HeaderActions hideSettings />
+                      </View>
+                    ),
+                    title: 'Settings',
+                  }}
+                />
+              </Stack>
+            </View>
           </View>
-        </View>
-      </AppLock>
+        </AppLock>
+      </ForegroundResumeAnimation>
       <StatusBar style="auto" />
     </ThemeProvider>
   );

@@ -1,8 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { observer } from 'mobx-react-lite';
-import { PropsWithChildren, useState } from 'react';
-import { Alert, Platform, Pressable, ScrollView, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Alert, Platform, Pressable, type GestureResponderEvent, View } from 'react-native';
 
+import { useWonkAnimation } from '@/components/foreground-resume-animation';
 import { MotionView } from '@/components/motion-view';
 import { ThemedText } from '@/components/themed-text';
 import { DeleteUserDialog } from '@/components/users/delete-user-dialog';
@@ -16,9 +17,13 @@ import type { User } from '@/state/schemas/user-schema';
 import { preferencesStorage } from '@/state/storage/preferences-storage';
 import { ScreenWithFooter } from '@/components/screen-with-footer';
 
+const FORCE_TOUCH_THRESHOLD = 0.75;
+
 export const UsersScreen = observer(function UsersScreen() {
   const navigation = useAppNavigation();
+  const { doBarrelRoll } = useWonkAnimation();
   const usersStore = useUsersStore();
+  const shouldSuppressAddUserPressRef = useRef(false);
   const [pendingDeleteUser, setPendingDeleteUser] = useState<User | undefined>();
   const [showUsersListDeleteButton, setShowUsersListDeleteButton] = useState(
     preferencesStorage.getPreferences()?.showUsersListDeleteButton ?? false
@@ -45,6 +50,29 @@ export const UsersScreen = observer(function UsersScreen() {
     ]);
   }
 
+  function maybeDoAddUserBarrelRoll(event: GestureResponderEvent) {
+    if (Platform.OS !== 'ios' || shouldSuppressAddUserPressRef.current) {
+      return;
+    }
+
+    const force = event.nativeEvent.force ?? 0;
+
+    if (force < FORCE_TOUCH_THRESHOLD) {
+      return;
+    }
+
+    shouldSuppressAddUserPressRef.current = doBarrelRoll();
+  }
+
+  function handleAddUserPress() {
+    if (shouldSuppressAddUserPressRef.current) {
+      shouldSuppressAddUserPressRef.current = false;
+      return;
+    }
+
+    navigation.toNewUser();
+  }
+
   const content = (
     <MotionView
       key="users-index-enter"
@@ -66,7 +94,18 @@ export const UsersScreen = observer(function UsersScreen() {
             testID="users-add-button"
             accessibilityLabel="Add User"
             accessibilityRole="button"
-            onPress={navigation.toNewUser}
+            delayLongPress={Platform.OS === 'ios' ? 650 : undefined}
+            onLongPress={Platform.OS === 'ios' ? () => {
+              if (shouldSuppressAddUserPressRef.current) {
+                return;
+              }
+
+              shouldSuppressAddUserPressRef.current = doBarrelRoll();
+            } : undefined}
+            onPress={handleAddUserPress}
+            onPressIn={maybeDoAddUserBarrelRoll}
+            onTouchMove={maybeDoAddUserBarrelRoll}
+            onTouchStart={maybeDoAddUserBarrelRoll}
             className="min-h-11 flex-row items-center gap-2.5 pr-[15px] active:opacity-75">
             <ThemedText
               type="defaultSemiBold"
