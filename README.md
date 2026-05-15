@@ -1,5 +1,7 @@
 # Gymflow Challenge
 
+### See the [live web version](https://vadimrostok.github.io/gymflow-challenge/)
+
 Gymflow Challenge is a shared Expo app for managing a small staff/member user list across web and native targets. It showcases Expo Router, React Native Web, NativeWind, MobX, Zod + React Hook Form, optional Supabase sync, persisted app preferences, solarized light/dark/auto themes, Motion/Reanimated animations, and Playwright/Detox smoke coverage. The core CRUD flow works without backend secrets; when Supabase env vars are present, the store can load and sync users remotely. The web build is static and can be deployed to GitHub Pages, including network-served painting assets used by the form parallax header.
 
 ## Install
