@@ -16,4 +16,10 @@
   [aria-disabled='true'] {
     cursor: default !important;
   }
+
+  select:focus-visible {
+    border: 2px white;
+    border-radius: 3px;
+    outline: none;
+  }
 }

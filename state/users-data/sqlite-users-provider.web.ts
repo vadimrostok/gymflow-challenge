@@ -22,6 +22,7 @@ function readUsers(): User[] {
   }
 
   try {
+    // TODO: maybe we should use indexdb here?
     const parsedValue = JSON.parse(window.localStorage.getItem(localUsersKey) ?? '[]') as Partial<User>[];
 
     return Array.isArray(parsedValue) ? parsedValue.filter(isUser) : [];

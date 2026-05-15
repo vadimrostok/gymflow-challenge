@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef, useState } from 'react';
 import { Alert, Platform, Pressable, type GestureResponderEvent, View } from 'react-native';
 
-import { useWonkAnimation } from '@/components/foreground-resume-animation';
+import { useWonkAnimation } from '@/components/easter-egg-animation.native';
 import { MotionView } from '@/components/motion-view';
 import { ThemedText } from '@/components/themed-text';
 import { DeleteUserDialog } from '@/components/users/delete-user-dialog';
@@ -18,6 +18,7 @@ import { preferencesStorage } from '@/state/storage/preferences-storage';
 import { ScreenWithFooter } from '@/components/screen-with-footer';
 
 const FORCE_TOUCH_THRESHOLD = 0.75;
+const isNativeMobile = Platform.OS !== 'web';
 
 export const UsersScreen = observer(function UsersScreen() {
   const navigation = useAppNavigation();
@@ -51,7 +52,7 @@ export const UsersScreen = observer(function UsersScreen() {
   }
 
   function maybeDoAddUserBarrelRoll(event: GestureResponderEvent) {
-    if (Platform.OS !== 'ios' || shouldSuppressAddUserPressRef.current) {
+    if (Platform.OS === 'web' || shouldSuppressAddUserPressRef.current) {
       return;
     }
 
@@ -94,8 +95,8 @@ export const UsersScreen = observer(function UsersScreen() {
             testID="users-add-button"
             accessibilityLabel="Add User"
             accessibilityRole="button"
-            delayLongPress={Platform.OS === 'ios' ? 650 : undefined}
-            onLongPress={Platform.OS === 'ios' ? () => {
+            delayLongPress={isNativeMobile ? 650 : undefined}
+            onLongPress={isNativeMobile ? () => {
               if (shouldSuppressAddUserPressRef.current) {
                 return;
               }

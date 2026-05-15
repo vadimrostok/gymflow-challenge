@@ -30,22 +30,23 @@ function updatePreferences(keyValue: Partial<Omit<AppPreferences, 'theme'>>) {
 export function SettingsScreen(): ReactElement {
   const colorScheme = useResolvedColorScheme();
   const palette = Colors[colorScheme];
-  const formBorderColor = colorScheme === 'dark' ? '#31565f' : SharedColors.white;
-  const storageSourcePickerContainerStyle = {
+  const pickerContainerStyle = {
     backgroundColor: palette.surface,
-    borderColor: formBorderColor,
+    borderColor: palette.formBorder,
     borderRadius: 8,
     borderWidth: 1,
     minHeight: 48,
     overflow: 'hidden' as const,
     width: '100%' as const,
-  };
+  }
   const storageSourcePickerStyle = {
     backgroundColor: SharedColors.transparent,
     color: palette.text,
     fontSize: 16,
-    minHeight: 48,
+    top: Platform.OS === 'web' ? undefined : -70,
+    height: Platform.OS === 'web' ? undefined : 100,
     paddingHorizontal: Platform.OS === 'web' ? 14 : 8,
+    paddingVertical: Platform.OS === 'web' ? 12 : undefined,
     width: '100%' as const,
   };
   const usersStore = useUsersStore();
@@ -102,33 +103,6 @@ export function SettingsScreen(): ReactElement {
           </ThemedText>
         </View>
 
-        <View className="gap-2">
-          <ThemedText type="defaultSemiBold">Remote data storage source</ThemedText>
-          <View style={storageSourcePickerContainerStyle}>
-            <Picker
-              dropdownIconColor={palette.mutedText}
-              itemStyle={{ color: palette.text, fontSize: 16 }}
-              mode="dropdown"
-              onValueChange={handleUsersStorageSourceChange}
-              selectedValue={usersStorageSource}
-              selectionColor={palette.primaryButtonBackground}
-              style={storageSourcePickerStyle}
-              testID="users-storage-source-picker">
-              {usersStorageSourceOptions.map((option) => (
-                <Picker.Item
-                  color={palette.text}
-                  key={option.value}
-                  label={option.label}
-                  value={option.value}
-                />
-              ))}
-            </Picker>
-          </View>
-          <ThemedText lightColor={Colors.light.mutedText} darkColor={Colors.dark.mutedText} className="text-sm leading-5">
-            Choose where user profiles are saved between app launches.
-          </ThemedText>
-        </View>
-
         {Platform.OS !== 'web' && (
           <>
             <SettingsCheckbox
@@ -162,6 +136,33 @@ export function SettingsScreen(): ReactElement {
           label="Deletable user list items"
           description="Show delete button on users list"
         />
+
+        <View className="gap-2 mt-10">
+          <ThemedText type="defaultSemiBold">Remote data storage source</ThemedText>
+          <View style={pickerContainerStyle}>
+            <Picker
+              dropdownIconColor={palette.mutedText}
+              itemStyle={{ color: palette.text, fontSize: 16 }}
+              mode="dialog"
+              onValueChange={handleUsersStorageSourceChange}
+              selectedValue={usersStorageSource}
+              selectionColor={palette.primaryButtonBackground}
+              style={storageSourcePickerStyle}
+              testID="users-storage-source-picker">
+              {usersStorageSourceOptions.map((option) => (
+                <Picker.Item
+                  color={palette.text}
+                  key={option.value}
+                  label={option.label}
+                  value={option.value}
+                />
+              ))}
+            </Picker>
+          </View>
+          <ThemedText lightColor={Colors.light.mutedText} darkColor={Colors.dark.mutedText} className="text-sm leading-5">
+            Choose where user profiles are saved between app launches.
+          </ThemedText>
+        </View>
       </ScreenWithFooter>
     </View>
   );

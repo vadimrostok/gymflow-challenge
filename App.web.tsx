@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { View } from 'react-native';
 
-import { AppHeader } from '@/components/app-header';
+import { AppHeader } from '@/components/app-header.web';
 import { AppFooter } from '@/components/app-footer';
 import { AppProviders } from '@/components/app-providers';
 import { PageScrollProvider } from '@/components/page-scroll-context';

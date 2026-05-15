@@ -6,8 +6,8 @@ import {
   type User,
   type UserFormValues,
 } from '@/state/schemas/user-schema';
-import { createSQLiteUsersProvider } from '@/state/users-data/sqlite-users-provider';
 import { createSupabaseUsersProvider } from '@/state/users-data/supabase-users-provider';
+import { createSQLiteUsersProvider } from '@/state/users-data/sqlite-users-provider';
 import {
   defaultUsersStorageSource,
   type UsersDataProvider,
@@ -15,7 +15,8 @@ import {
 } from '@/state/users-data/users-data-provider';
 
 const initialUsers: User[] = [
-  /*{
+  /*
+  {
     id: 'demo-ada-lovelace',
     fullName: 'Ada Lovelace',
     role: 'STAFF',
@@ -30,7 +31,8 @@ const initialUsers: User[] = [
     dateOfBirth: '1918-08-26',
     updatedAt: createTimestamp(),
     createdAt: createTimestamp(),
-  },*/
+  },
+  */
 ];
 
 type UsersDataProviders = Record<UsersStorageSource, UsersDataProvider>;

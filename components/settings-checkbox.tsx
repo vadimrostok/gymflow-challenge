@@ -21,7 +21,7 @@ export const SettingsCheckbox = (
     accessibilityRole="checkbox"
     accessibilityState={{checked: isEnabled}}
     onPress={() => enabledSetStateFn((currentValue) => !currentValue)}
-    className="flex-row items-start gap-3 rounded-lg border border-white bg-solarized-base2 p-4 active:opacity-75 dark:bg-solarized-base02"
+    className="mt-5 flex-row items-start gap-3 rounded-lg border border-white bg-solarized-base2 p-4 active:opacity-75 dark:bg-solarized-base02"
   >
     <View
       className={
