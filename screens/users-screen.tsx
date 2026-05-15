@@ -16,6 +16,7 @@ import { useUsersStore } from '@/state/context/users-context';
 import type { User } from '@/state/schemas/user-schema';
 import { preferencesStorage } from '@/state/storage/preferences-storage';
 import { ScreenWithFooter } from '@/components/screen-with-footer';
+import clsx from 'clsx';
 
 const FORCE_TOUCH_THRESHOLD = 0.75;
 const isNativeMobile = Platform.OS !== 'web';
@@ -107,7 +108,12 @@ export const UsersScreen = observer(function UsersScreen() {
             onPressIn={maybeDoAddUserBarrelRoll}
             onTouchMove={maybeDoAddUserBarrelRoll}
             onTouchStart={maybeDoAddUserBarrelRoll}
-            className="min-h-11 flex-row items-center gap-2.5 pr-[15px] active:opacity-75">
+            className={clsx(
+              'ml-auto min-h-11 flex-row items-center gap-2.5 self-end active:opacity-75', {
+                'pr-[10px]': Platform.OS === 'ios',
+                'pr-[15px]': Platform.OS !== 'ios',
+              }
+            )}>
             <ThemedText
               type="defaultSemiBold"
               lightColor={Colors.light.primaryButtonBackground}

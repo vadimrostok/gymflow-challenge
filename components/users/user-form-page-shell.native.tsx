@@ -19,12 +19,13 @@ type UserFormPageShellProps = PropsWithChildren<{
   title: string;
 }>;
 
-const AnimatedScrollView = Animated.ScrollView;
+const AnimatedFlatList = Animated.FlatList<typeof formPageContentKey>;
 const AnimatedView = Animated.View;
+const formPageContentKey = 'form-page-content';
 
 export function UserFormPageShell({ children, motionKey, title }: UserFormPageShellProps) {
   const scrollY = useSharedValue(0);
-  const scrollRef = useRef<ComponentRef<typeof AnimatedScrollView>>(null);
+  const scrollRef = useRef<ComponentRef<typeof AnimatedFlatList>>(null);
   const painting = useMemo(() => getNextPainting(), []);
   const [isImageVisible, setIsImageVisible] = useState(Boolean(painting));
   const [imageSize, setImageSize] = useState(
@@ -63,7 +64,7 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
   const hideFailedImage = useCallback(() => {
     setIsImageVisible(false);
     scrollY.value = 0;
-    scrollRef.current?.scrollTo({ y: 0, animated: false });
+    scrollRef.current?.scrollToOffset({ offset: 0, animated: false });
   }, [scrollY]);
 
   useEffect(() => {
@@ -92,14 +93,14 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
 
     const timeoutId = setTimeout(() => {
       scrollY.value = initialScrollOffset;
-      scrollRef.current?.scrollTo({ y: initialScrollOffset, animated: false });
+      scrollRef.current?.scrollToOffset({ offset: initialScrollOffset, animated: false });
     }, 0);
 
     return () => clearTimeout(timeoutId);
   }, [initialScrollOffset, isImageVisible, scrollY]);
 
   return (
-    <AnimatedScrollView
+    <AnimatedFlatList
       testID="user-form-scroll"
       ref={scrollRef}
       className="flex-1"
@@ -110,62 +111,66 @@ export function UserFormPageShell({ children, motionKey, title }: UserFormPageSh
       }}
       keyboardDismissMode="interactive"
       keyboardShouldPersistTaps="always"
+      data={[formPageContentKey]}
+      keyExtractor={(item) => item}
+      ListFooterComponent={AppFooter}
       onScroll={scrollHandler}
-      scrollEventThrottle={16}
-      showsVerticalScrollIndicator={false}>
-      <MotionView
-        key={motionKey}
-        initial={{ opacity: 0, y: -200 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        onStartShouldSetResponderCapture={() => {
-          Keyboard.dismiss();
+      renderItem={() => (
+        <MotionView
+          key={motionKey}
+          initial={{ opacity: 0, y: -200 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          onStartShouldSetResponderCapture={() => {
+            Keyboard.dismiss();
 
-          return false;
-        }}
-        style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', width: '100%' }}>
-        {isImageVisible && painting ? (
-          <AnimatedView
-            pointerEvents="none"
-            testID="parallax-image-hitbox"
-            style={{ height: expandedHeaderHeight, overflow: 'hidden', width: '100%' }}>
+            return false;
+          }}
+          style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', width: '100%' }}>
+          {isImageVisible && painting ? (
             <AnimatedView
               pointerEvents="none"
-              testID="parallax-image-layer"
-              style={[
-                {
-                  height: expandedHeaderHeight,
-                  left: 0,
-                  position: 'absolute',
-                  right: 0,
-                  top: 0,
-                },
-                imageStyle,
-              ]}>
-              <Image
-                accessibilityIgnoresInvertColors
-                onError={hideFailedImage}
-                resizeMode="cover"
-                source={{ uri: painting.uri }}
-                style={{ height: '100%', width: '100%' }}
-              />
-              <View
-                className="bg-solarized-base03/25"
+              testID="parallax-image-hitbox"
+              style={{ height: expandedHeaderHeight, overflow: 'hidden', width: '100%' }}>
+              <AnimatedView
                 pointerEvents="none"
-                testID="parallax-image-overlay"
-                style={{ bottom: 0, left: 0, position: 'absolute', right: 0, top: 0 }}
-              />
+                testID="parallax-image-layer"
+                style={[
+                  {
+                    height: expandedHeaderHeight,
+                    left: 0,
+                    position: 'absolute',
+                    right: 0,
+                    top: 0,
+                  },
+                  imageStyle,
+                ]}>
+                <Image
+                  accessibilityIgnoresInvertColors
+                  onError={hideFailedImage}
+                  resizeMode="cover"
+                  source={{ uri: painting.uri }}
+                  style={{ height: '100%', width: '100%' }}
+                />
+                <View
+                  className="bg-solarized-base03/25"
+                  pointerEvents="none"
+                  testID="parallax-image-overlay"
+                  style={{ bottom: 0, left: 0, position: 'absolute', right: 0, top: 0 }}
+                />
+              </AnimatedView>
             </AnimatedView>
-          </AnimatedView>
-        ) : null}
-        <View
-          className="w-full gap-[22px] p-5"
-          style={{ marginLeft: 'auto', marginRight: 'auto', maxWidth: 860 }}>
-          <ThemedText type="title">{title}</ThemedText>
-          {children}
-        </View>
-      </MotionView>
-      <AppFooter />
-    </AnimatedScrollView>
+          ) : null}
+          <View
+            className="w-full gap-[22px] p-5"
+            style={{ marginLeft: 'auto', marginRight: 'auto', maxWidth: 860 }}>
+            <ThemedText type="title">{title}</ThemedText>
+            {children}
+          </View>
+        </MotionView>
+      )}
+      scrollEventThrottle={16}
+      showsVerticalScrollIndicator={false}
+    />
   );
 }

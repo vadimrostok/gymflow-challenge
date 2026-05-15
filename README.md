@@ -89,6 +89,7 @@ brew install applesimutils
 
 - [Challenge Spec](docs/CHALLENGE-SPEC.md)
 - **[Post development review](docs/POST-DEVELOPMENT-REVIEW.md)**
+- [Demo video](docs/demo-video/demo%20480p.mov)
 - [What's being tested?](docs/TESTING.md)
 - [(Codex-generated) implementation plan](docs/IMPLEMENTATION-PLAN.INITIAL.md), and [updated version](docs/IMPLEMENTATION-PLAN.REFINED.md)
 - [Manual draft](docs/DRAFT-IMPLEMENTATION-PLAN.md) and [progress log](docs/.progress.log)
