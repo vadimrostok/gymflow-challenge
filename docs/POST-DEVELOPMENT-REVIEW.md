@@ -16,3 +16,34 @@ My initial workflow:
 - After the core functionality is good and well on both platforms, there are working unit/ui/e2e tests, I can focus on additional improvements: an easter egg, a remote data storage, "secure mode", etc.
 - I prepare GitHub actions to deploy the app for the web, serve images from GitHub pages to the mobile app (to decrease bundle size), add unit/ui, e2e-web, and e2e-mobile (detox) test runner actions, and add unit/ui as a guard for the `main` branch on GitHub.
 - Do some final polishing and write this list.
+
+# Important implementation notes
+
+## User data storage
+
+The app can store users in either Supabase or local SQLite. This is controlled from Settings via the "Remote data storage source" picker, and the selected source is persisted as an app preference. The MobX users store talks to the currently selected provider through a shared provider interface, so the user-facing CRUD flow stays the same regardless of whether the backing provider is remote or local.
+
+Supabase is useful for remote persistence and web/mobile continuity when `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are configured. SQLite is useful as a local-only fallback and for running the app without backend setup.
+
+## Light, dark, and auto theme behavior
+
+The light/dark/auto theme flow is slightly convoluted because web and native resolve "auto" differently.
+
+On the web, auto mode is resolved through React Native's `useColorScheme()` hook, which React Native Web maps to the browser/system `prefers-color-scheme` value. That value becomes `resolvedColorScheme`, and then NativeWind's `setColorScheme(...)` receives the already-resolved `light` or `dark` value. In other words, web auto mode is resolved in JavaScript before it is passed to NativeWind.
+
+On iOS, auto mode is delegated to the platform. When auto is enabled, the app calls NativeWind's `setColorScheme('system')` instead of forcing the current resolved value. iOS then applies the system appearance, which causes `useColorScheme()` to emit the actual `light` or `dark` value. Only after that does `resolvedColorScheme` become synchronized with the theme that iOS actually applied.
+
+This is why the implementation does not simply call `setColorScheme(resolvedColorScheme)` in every case. Passing `system` is meaningful on native because iOS understands it as "follow system appearance"; on web, the equivalent behavior comes from listening to `prefers-color-scheme`.
+
+## Theme providers and routing
+
+There are two different theme-related providers, and they solve different problems.
+
+`ThemeModeProvider` is the app-level theme provider. It lives in `components/app-providers.tsx`, is used by both native and web, owns `isAuto`, `resolvedColorScheme`, preference persistence, and calls NativeWind's `setColorScheme(...)`.
+
+`ThemeProvider` from `@react-navigation/native` is the React Navigation theme provider. It lives in `app/_layout.tsx` and matters for the Expo Router / native stack UI, especially native headers. It is not the source of truth for the app theme; it adapts React Navigation chrome to the app's resolved theme.
+
+The platform routing split is also important. Native uses Expo Router and the stack layout in `app/_layout.tsx`. Web uses `App.web.tsx`, React Router, and web-specific header/layout components, so web does not go through the native stack layout. Both platforms still share the app-level providers through `AppProviders`.
+
+## An easter egg
+Try holding the "Add user" button on mobile for a few seconds and you'll see it.
