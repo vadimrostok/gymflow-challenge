@@ -4,6 +4,8 @@ const now = Date.now();
 const userName = `E2E Full Flow ${now}`;
 const updatedUserName = `E2E Full Flow ${now} (Edited)`;
 const shortNameError = 'Full name must be at least 3 characters.';
+const preferencesStorageKey = 'gymflow.preferences';
+const localUsersStorageKey = 'gymflow.sqlite-users';
 
 async function fillName(page: Page, name: string) {
   await page.getByTestId('full-name-input').fill(name);
@@ -22,7 +24,11 @@ async function chooseRole(page: Page, role: 'Staff' | 'Member') {
 test.describe('Gymflow users lifecycle flow', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/users');
-    await page.evaluate(() => localStorage.clear());
+    await page.evaluate(({ preferencesKey, usersKey }) => {
+      localStorage.clear();
+      localStorage.setItem(preferencesKey, JSON.stringify({ usersStorageSource: 'sqlite' }));
+      localStorage.removeItem(usersKey);
+    }, { preferencesKey: preferencesStorageKey, usersKey: localUsersStorageKey });
     await page.goto('/users');
     await expect(page.getByTestId('users-add-button')).toBeVisible();
   });
