@@ -244,4 +244,61 @@ describe('UsersStore', () => {
     expect(usersStore.findUser('1')).toBeUndefined();
     expect(didResolveDelete).toBe(true);
   });
+
+  it('does not let stale Supabase loads overwrite newer load results', async () => {
+    jest.useFakeTimers();
+
+    const staleLoad = createDeferred<{ data: SupabaseUserRow[]; error: null }>();
+    const freshLoad = createDeferred<{ data: SupabaseUserRow[]; error: null }>();
+    const freshUser: SupabaseUserRow = {
+      id: 2,
+      createdAt: '2026-05-14T11:00:00.000Z',
+      updatedAt: '2026-05-14T11:00:00.000Z',
+      fullName: 'Katherine Johnson',
+      role: 'MEMBER',
+      dateOfBirth: '1918-08-26',
+    };
+    const loadResults = [staleLoad.promise, freshLoad.promise];
+    const client: UsersSupabaseClient = {
+      from: jest.fn(() => ({
+        delete: () => ({
+          eq: () => Promise.resolve({ data: null, error: null }),
+        }),
+        insert: () => ({
+          select: () => ({
+            single: () => Promise.resolve({ data: null, error: null }),
+          }),
+        }),
+        select: () => ({
+          order: () => loadResults.shift() ?? Promise.resolve({ data: [], error: null }),
+        }),
+        update: () => ({
+          eq: () => ({
+            select: () => ({
+              single: () => Promise.resolve({ data: null, error: null }),
+            }),
+          }),
+        }),
+      })),
+    };
+    const usersStore = createUsersStore(client);
+    const freshLoadPromise = usersStore.loadUsers();
+
+    freshLoad.resolve({ data: [freshUser], error: null });
+    await freshLoadPromise;
+
+    expect(usersStore.users).toEqual([
+      expect.objectContaining({ id: '2', fullName: 'Katherine Johnson' }),
+    ]);
+
+    staleLoad.resolve({ data: [serverUser], error: null });
+    await flushPromises();
+
+    expect(usersStore.users).toEqual([
+      expect.objectContaining({ id: '2', fullName: 'Katherine Johnson' }),
+    ]);
+
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
 });

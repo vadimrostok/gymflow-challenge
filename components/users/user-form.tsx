@@ -133,7 +133,7 @@ function getDefaultDatePickerValue(value: string) {
   return value || undefined;
 }
 
-function parseDatePickerValue(date: DateType) {
+export function parseDatePickerValue(date: DateType) {
   if (!date) {
     return '';
   }
