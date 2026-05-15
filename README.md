@@ -88,7 +88,9 @@ brew install applesimutils
 ## Docs
 
 - [Challenge Spec](docs/CHALLENGE-SPEC.md)
-- [(Codex-generated) implementation plan](docs/IMPLEMENTATION-PLAN.PRE.md), and [updated version](docs/IMPLEMENTATION-PLAN.POST.md)
-- [Manual draft](docs/IMPLEMENTATION-PLAN.draft.md) and [progress log](docs/.progress.log)
+- **[Post development review](docs/POST-DEVELOPMENT-REVIEW.md)**
+- [What's being tested?](docs/TESTING.md)
+- [(Codex-generated) implementation plan](docs/IMPLEMENTATION-PLAN.INITIAL.md), and [updated version](docs/IMPLEMENTATION-PLAN.REFINED.md)
+- [Manual draft](docs/DRAFT-IMPLEMENTATION-PLAN.md) and [progress log](docs/.progress.log)
 - [GitHub Pages deployment](docs/GITHUB-PAGES-DEPLOYMENT.md)
 - [AGENTS.md](docs/AGENTS.md)

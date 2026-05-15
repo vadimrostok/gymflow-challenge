@@ -12,6 +12,7 @@ jest.mock('expo-local-authentication', () => ({
 }));
 
 let mockPreferences: AppPreferences | undefined;
+const mockSetStorageSource = jest.fn();
 
 jest.mock('@/state/storage/preferences-storage', () => ({
   createMemoryPreferencesStorage: (initialPreferences?: AppPreferences) => {
@@ -32,6 +33,12 @@ jest.mock('@/state/storage/preferences-storage', () => ({
   },
 }));
 
+jest.mock('@/state/context/users-context', () => ({
+  useUsersStore: () => ({
+    setStorageSource: mockSetStorageSource,
+  }),
+}));
+
 const authenticateAsync = LocalAuthentication.authenticateAsync as jest.Mock;
 
 describe('SettingsScreen', () => {
@@ -43,6 +50,7 @@ describe('SettingsScreen', () => {
       value: 'ios',
     });
     authenticateAsync.mockReset();
+    mockSetStorageSource.mockReset();
     mockPreferences = {};
   });
 
@@ -98,6 +106,25 @@ describe('SettingsScreen', () => {
     await waitFor(() => {
       expect(screen.getByText('Cancelled')).toBeTruthy();
       expect(preferencesStorage.getPreferences()).toEqual({ isSecureModeEnabled: false });
+    });
+  });
+
+  it('persists the selected users storage source and asks the store to switch providers', async () => {
+    preferencesStorage.setPreferences({
+      theme: { isAuto: false, mode: 'dark' },
+      usersStorageSource: 'supabase',
+    });
+
+    renderWithTheme(<SettingsScreen />);
+
+    fireEvent(screen.getByTestId('users-storage-source-picker'), 'onValueChange', 'sqlite');
+
+    await waitFor(() => {
+      expect(preferencesStorage.getPreferences()).toEqual({
+        theme: { isAuto: false, mode: 'dark' },
+        usersStorageSource: 'sqlite',
+      });
+      expect(mockSetStorageSource).toHaveBeenCalledWith('sqlite');
     });
   });
 });
