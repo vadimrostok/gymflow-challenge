@@ -1,4 +1,5 @@
 import { ReactElement, useCallback, useState } from 'react';
+import { Picker } from '@react-native-picker/picker';
 import { Platform, View } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { LocalAuthenticationResult } from 'expo-local-authentication';
@@ -9,8 +10,16 @@ import { preferencesStorage } from '@/state/storage/preferences-storage';
 import { ScreenWithFooter } from '@/components/screen-with-footer';
 import { AppPreferences } from '@/state/storage/preferences-types';
 import { SettingsCheckbox } from '@/components/settings-checkbox';
+import { useUsersStore } from '@/state/context/users-context';
+import { useResolvedColorScheme } from '@/state/context/theme-mode';
+import {
+  defaultUsersStorageSource,
+  isUsersStorageSource,
+  usersStorageSourceOptions,
+  type UsersStorageSource,
+} from '@/state/users-data/users-data-provider';
 
-function updatePreferences(keyValue: { [K in keyof Omit<AppPreferences, 'theme'>]: boolean }) {
+function updatePreferences(keyValue: Partial<Omit<AppPreferences, 'theme'>>) {
   const preferences = preferencesStorage.getPreferences() ?? {};
   preferencesStorage.setPreferences({
     ...preferences,
@@ -19,10 +28,34 @@ function updatePreferences(keyValue: { [K in keyof Omit<AppPreferences, 'theme'>
 }
 
 export function SettingsScreen(): ReactElement {
+  const colorScheme = useResolvedColorScheme();
+  const palette = Colors[colorScheme];
+  const formBorderColor = colorScheme === 'dark' ? '#31565f' : SharedColors.white;
+  const storageSourcePickerContainerStyle = {
+    backgroundColor: palette.surface,
+    borderColor: formBorderColor,
+    borderRadius: 8,
+    borderWidth: 1,
+    minHeight: 48,
+    overflow: 'hidden' as const,
+    width: '100%' as const,
+  };
+  const storageSourcePickerStyle = {
+    backgroundColor: SharedColors.transparent,
+    color: palette.text,
+    fontSize: 16,
+    minHeight: 48,
+    paddingHorizontal: Platform.OS === 'web' ? 14 : 8,
+    width: '100%' as const,
+  };
+  const usersStore = useUsersStore();
   const preferences = preferencesStorage.getPreferences();
   const [isSecureModeEnabled, setIsSecureModeEnabled] = useState(preferences?.isSecureModeEnabled ?? false);
   const [showUsersListDeleteButton, setShowUsersListDeleteButton] =
     useState(preferences?.showUsersListDeleteButton ?? false);
+  const [usersStorageSource, setUsersStorageSource] = useState<UsersStorageSource>(
+    preferences?.usersStorageSource ?? defaultUsersStorageSource
+  );
   const [localAuthErrorMessage, setLocalAuthErrorMessage] = useState<string | null>(null);
 
   const handleShowUsersListDeleteButtonToggle = useCallback(() => {
@@ -49,6 +82,15 @@ export function SettingsScreen(): ReactElement {
 
     updatePreferences({ isSecureModeEnabled: isAuthorisedPreference });
   }, [isSecureModeEnabled])
+  const handleUsersStorageSourceChange = useCallback((selectedValue: unknown) => {
+    if (!isUsersStorageSource(selectedValue)) {
+      return;
+    }
+
+    setUsersStorageSource(selectedValue);
+    updatePreferences({ usersStorageSource: selectedValue });
+    void usersStore.setStorageSource(selectedValue);
+  }, [usersStore]);
 
   return (
     <View className="flex-1 bg-solarized-base3 dark:bg-solarized-base03">
@@ -57,6 +99,33 @@ export function SettingsScreen(): ReactElement {
           <ThemedText type="title">Settings</ThemedText>
           <ThemedText lightColor={Colors.light.mutedText} darkColor={Colors.dark.mutedText}>
             Local app preferences for this challenge build.
+          </ThemedText>
+        </View>
+
+        <View className="gap-2">
+          <ThemedText type="defaultSemiBold">Remote data storage source</ThemedText>
+          <View style={storageSourcePickerContainerStyle}>
+            <Picker
+              dropdownIconColor={palette.mutedText}
+              itemStyle={{ color: palette.text, fontSize: 16 }}
+              mode="dropdown"
+              onValueChange={handleUsersStorageSourceChange}
+              selectedValue={usersStorageSource}
+              selectionColor={palette.primaryButtonBackground}
+              style={storageSourcePickerStyle}
+              testID="users-storage-source-picker">
+              {usersStorageSourceOptions.map((option) => (
+                <Picker.Item
+                  color={palette.text}
+                  key={option.value}
+                  label={option.label}
+                  value={option.value}
+                />
+              ))}
+            </Picker>
+          </View>
+          <ThemedText lightColor={Colors.light.mutedText} darkColor={Colors.dark.mutedText} className="text-sm leading-5">
+            Choose where user profiles are saved between app launches.
           </ThemedText>
         </View>
 

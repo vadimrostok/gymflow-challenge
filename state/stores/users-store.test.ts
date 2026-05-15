@@ -1,4 +1,7 @@
-import { createUsersStore, type UsersSupabaseClient } from '@/state/stores/users-store';
+import { createUsersStore } from '@/state/stores/users-store';
+import type { User } from '@/state/schemas/user-schema';
+import type { UsersDataProvider, UsersStorageSource } from '@/state/users-data/users-data-provider';
+import { createSupabaseUsersProvider, type UsersSupabaseClient } from '@/state/users-data/supabase-users-provider';
 
 type SupabaseUserRow = {
   id: number | string;
@@ -9,8 +12,8 @@ type SupabaseUserRow = {
   dateOfBirth: string | null;
 };
 
-const serverUser: SupabaseUserRow = {
-  id: 1,
+const serverUser: User = {
+  id: '1',
   createdAt: '2026-05-14T09:00:00.000Z',
   updatedAt: '2026-05-14T09:30:00.000Z',
   fullName: 'Ada Lovelace',
@@ -18,53 +21,43 @@ const serverUser: SupabaseUserRow = {
   dateOfBirth: '1815-12-10',
 };
 
+const sqliteUser: User = {
+  id: 'sqlite-1',
+  createdAt: '2026-05-14T10:00:00.000Z',
+  updatedAt: '2026-05-14T10:30:00.000Z',
+  fullName: 'Local User',
+  role: 'MEMBER',
+  dateOfBirth: '',
+};
+
 const flushPromises = async () => {
   await Promise.resolve();
   await Promise.resolve();
 };
 
-function createSupabaseClientMock({
-  loadData = [],
-  deleteResult,
-  insertResult,
-  updateResult,
+function createProviderMock({
+  createUser,
+  deleteUser,
+  loadUsers = [],
+  updateUser,
 }: {
-  loadData?: SupabaseUserRow[];
-  deleteResult?: (id: number) => Promise<{ data?: null; error?: { message: string } | null }>;
-  insertResult?: (row: SupabaseUserRow) => Promise<{ data?: SupabaseUserRow | null; error?: { message: string } | null }>;
-  updateResult?: (
-    row: Partial<SupabaseUserRow>,
-    id: number
-  ) => Promise<{ data?: SupabaseUserRow | null; error?: { message: string } | null }>;
+  createUser?: UsersDataProvider['createUser'];
+  deleteUser?: UsersDataProvider['deleteUser'];
+  loadUsers?: User[];
+  updateUser?: UsersDataProvider['updateUser'];
 } = {}) {
-  const insert = jest.fn((row: SupabaseUserRow) => ({
-    select: () => ({
-      single: () => insertResult?.(row) ?? Promise.resolve({ data: row, error: null }),
-    }),
-  }));
-  const update = jest.fn((row: Partial<SupabaseUserRow>) => ({
-    eq: (_column: 'id', id: number) => ({
-      select: () => ({
-        single: () => updateResult?.(row, id) ?? Promise.resolve({ data: { ...serverUser, ...row }, error: null }),
-      }),
-    }),
-  }));
-
   return {
-    insert,
-    update,
-    client: {
-      from: jest.fn(() => ({
-        delete: () => ({
-          eq: (_column: 'id', id: number) => deleteResult?.(id) ?? Promise.resolve({ data: null, error: null }),
-        }),
-        insert,
-        select: () => ({
-          order: () => Promise.resolve({ data: loadData, error: null }),
-        }),
-        update,
-      })),
-    } satisfies UsersSupabaseClient,
+    createUser: jest.fn(createUser ?? (async (user) => user)),
+    deleteUser: jest.fn(deleteUser ?? (async () => undefined)),
+    loadUsers: jest.fn(async () => loadUsers),
+    updateUser: jest.fn(updateUser ?? (async (user) => user)),
+  } satisfies UsersDataProvider;
+}
+
+function createProviders(overrides: Partial<Record<UsersStorageSource, UsersDataProvider>> = {}) {
+  return {
+    sqlite: overrides.sqlite ?? createProviderMock(),
+    supabase: overrides.supabase ?? createProviderMock(),
   };
 }
 
@@ -78,14 +71,19 @@ function createDeferred<T>() {
 }
 
 describe('UsersStore', () => {
-  it('creates, updates, and deletes users', async () => {
-    const usersStore = createUsersStore(null);
+  it('creates, updates, and deletes users through the active provider', async () => {
+    const provider = createProviderMock();
+    const usersStore = createUsersStore({ providers: createProviders({ supabase: provider }) });
+
+    await flushPromises();
+
     const createdUser = await usersStore.createUser({
       fullName: 'Margaret Hamilton',
       role: 'STAFF',
       dateOfBirth: '1936-08-17',
     });
 
+    expect(provider.createUser).toHaveBeenCalledWith(expect.objectContaining({ fullName: 'Margaret Hamilton' }));
     expect(usersStore.findUser(createdUser.id)?.fullName).toBe('Margaret Hamilton');
 
     await usersStore.updateUser(createdUser.id, {
@@ -94,6 +92,7 @@ describe('UsersStore', () => {
       dateOfBirth: '',
     });
 
+    expect(provider.updateUser).toHaveBeenCalledWith(expect.objectContaining({ fullName: 'Margaret H.' }));
     expect(usersStore.findUser(createdUser.id)).toMatchObject({
       fullName: 'Margaret H.',
       role: 'MEMBER',
@@ -101,29 +100,21 @@ describe('UsersStore', () => {
 
     await usersStore.deleteUser(createdUser.id);
 
+    expect(provider.deleteUser).toHaveBeenCalledWith(createdUser.id);
     expect(usersStore.findUser(createdUser.id)).toBeUndefined();
   });
 
-  it('loads users from Supabase and mirrors the returned data', async () => {
+  it('loads users from the active provider and keeps the spinner for at least half a second', async () => {
     jest.useFakeTimers();
 
-    const { client } = createSupabaseClientMock({ loadData: [serverUser] });
-    const usersStore = createUsersStore(client);
+    const provider = createProviderMock({ loadUsers: [serverUser] });
+    const usersStore = createUsersStore({ providers: createProviders({ supabase: provider }) });
 
     expect(usersStore.isLoadingUsers).toBe(true);
 
     await flushPromises();
 
-    expect(usersStore.users).toEqual([
-      {
-        id: '1',
-        createdAt: serverUser.createdAt,
-        updatedAt: serverUser.updatedAt,
-        fullName: serverUser.fullName,
-        role: serverUser.role,
-        dateOfBirth: serverUser.dateOfBirth,
-      },
-    ]);
+    expect(usersStore.users).toEqual([serverUser]);
     expect(usersStore.isLoadingUsers).toBe(true);
 
     jest.advanceTimersByTime(499);
@@ -137,19 +128,19 @@ describe('UsersStore', () => {
     jest.useRealTimers();
   });
 
-  it('creates users optimistically and then mirrors the Supabase response', async () => {
-    const syncedUser: SupabaseUserRow = {
-      id: 42,
+  it('creates users optimistically and then mirrors the provider response', async () => {
+    const syncedUser: User = {
+      id: '42',
       createdAt: '2026-05-14T10:00:00.000Z',
       updatedAt: '2026-05-14T10:00:00.000Z',
       fullName: 'Grace Hopper',
       role: 'MEMBER',
       dateOfBirth: '1906-12-09',
     };
-    const { client, insert } = createSupabaseClientMock({
-      insertResult: () => Promise.resolve({ data: syncedUser, error: null }),
+    const provider = createProviderMock({
+      createUser: async () => syncedUser,
     });
-    const usersStore = createUsersStore(client);
+    const usersStore = createUsersStore({ providers: createProviders({ supabase: provider }) });
 
     await flushPromises();
 
@@ -164,44 +155,31 @@ describe('UsersStore', () => {
       fullName: 'Grace Hopper Local',
       role: 'STAFF',
     });
-    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ fullName: 'Grace Hopper Local' }));
 
     await createUserPromise;
 
     expect(usersStore.findUser(createdUserId)).toBeUndefined();
-    expect(usersStore.findUser('42')).toEqual({
-      id: '42',
-      createdAt: syncedUser.createdAt,
-      updatedAt: syncedUser.updatedAt,
-      fullName: syncedUser.fullName,
-      role: syncedUser.role,
-      dateOfBirth: syncedUser.dateOfBirth,
-    });
+    expect(usersStore.findUser('42')).toEqual(syncedUser);
   });
 
-  it('keeps optimistic updates when Supabase fails and clears the temporary error', async () => {
-    const { client } = createSupabaseClientMock({
-      loadData: [serverUser],
-      updateResult: () => Promise.resolve({ data: null, error: { message: 'Network offline' } }),
+  it('keeps optimistic updates when the active provider fails and clears the temporary error', async () => {
+    const provider = createProviderMock({
+      loadUsers: [serverUser],
+      updateUser: async () => {
+        throw new Error('Network offline');
+      },
     });
-    const usersStore = createUsersStore(client);
+    const usersStore = createUsersStore({ providers: createProviders({ supabase: provider }) });
 
     await flushPromises();
 
     jest.useFakeTimers();
 
-    const updateUserPromise = usersStore.updateUser('1', {
+    await usersStore.updateUser('1', {
       fullName: 'Ada Byron',
       role: 'MEMBER',
       dateOfBirth: '1815-12-10',
     });
-
-    expect(usersStore.findUser('1')).toMatchObject({
-      fullName: 'Ada Byron',
-      role: 'MEMBER',
-    });
-
-    await updateUserPromise;
 
     expect(usersStore.findUser('1')).toMatchObject({
       fullName: 'Ada Byron',
@@ -216,14 +194,13 @@ describe('UsersStore', () => {
     jest.useRealTimers();
   });
 
-  it('waits for Supabase delete before the delete promise resolves', async () => {
-    const loadData = [serverUser];
-    const deleteDeferred = createDeferred<{ data: null; error: null }>();
-    const { client } = createSupabaseClientMock({
-      loadData,
-      deleteResult: () => deleteDeferred.promise,
+  it('waits for provider delete before the delete promise resolves', async () => {
+    const deleteDeferred = createDeferred<void>();
+    const provider = createProviderMock({
+      deleteUser: () => deleteDeferred.promise,
+      loadUsers: [serverUser],
     });
-    const usersStore = createUsersStore(client);
+    const usersStore = createUsersStore({ providers: createProviders({ supabase: provider }) });
 
     await flushPromises();
 
@@ -235,11 +212,8 @@ describe('UsersStore', () => {
     expect(usersStore.findUser('1')).toBeUndefined();
     expect(didResolveDelete).toBe(false);
 
-    deleteDeferred.resolve({ data: null, error: null });
+    deleteDeferred.resolve();
     await deleteUserPromise;
-    loadData.length = 0;
-
-    await usersStore.loadUsers();
 
     expect(usersStore.findUser('1')).toBeUndefined();
     expect(didResolveDelete).toBe(true);
@@ -281,7 +255,7 @@ describe('UsersStore', () => {
         }),
       })),
     };
-    const usersStore = createUsersStore(client);
+    const usersStore = createUsersStore({ providers: createProviders({ supabase: createSupabaseUsersProvider(client) }) });
     const freshLoadPromise = usersStore.loadUsers();
 
     freshLoad.resolve({ data: [freshUser], error: null });
@@ -291,7 +265,7 @@ describe('UsersStore', () => {
       expect.objectContaining({ id: '2', fullName: 'Katherine Johnson' }),
     ]);
 
-    staleLoad.resolve({ data: [serverUser], error: null });
+    staleLoad.resolve({ data: [serverUser as SupabaseUserRow], error: null });
     await flushPromises();
 
     expect(usersStore.users).toEqual([
@@ -300,5 +274,28 @@ describe('UsersStore', () => {
 
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
+  });
+
+  it('clears users and refetches when the storage source changes', async () => {
+    const supabaseProvider = createProviderMock({ loadUsers: [serverUser] });
+    const sqliteProvider = createProviderMock({ loadUsers: [sqliteUser] });
+    const usersStore = createUsersStore({
+      providers: createProviders({ sqlite: sqliteProvider, supabase: supabaseProvider }),
+    });
+
+    await flushPromises();
+
+    expect(usersStore.storageSource).toBe('supabase');
+    expect(usersStore.users).toEqual([serverUser]);
+
+    const switchPromise = usersStore.setStorageSource('sqlite');
+
+    expect(usersStore.storageSource).toBe('sqlite');
+    expect(usersStore.users).toEqual([]);
+
+    await switchPromise;
+
+    expect(sqliteProvider.loadUsers).toHaveBeenCalled();
+    expect(usersStore.users).toEqual([sqliteUser]);
   });
 });

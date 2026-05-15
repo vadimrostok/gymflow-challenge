@@ -1,5 +1,6 @@
 import type { AppPreferences } from '@/state/storage/preferences-types';
 import { AppThemePreferences } from '@/state/storage/preferences-storage';
+import { isUsersStorageSource } from '@/state/users-data/users-data-provider';
 
 export const preferencesKey = 'gymflow.preferences';
 
@@ -23,9 +24,13 @@ export function parsePreferences(value: string | null): AppPreferences | undefin
     const parsedTheme = isThemePreferences(parsedValue.theme)
       ? parsedValue.theme
       : undefined;
+    const parsedUsersStorageSource = isUsersStorageSource(parsedValue.usersStorageSource)
+      ? parsedValue.usersStorageSource
+      : undefined;
     return {
       ...parsedValue,
       theme: parsedTheme,
+      usersStorageSource: parsedUsersStorageSource,
     };
   } catch {
     return undefined;

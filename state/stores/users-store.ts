@@ -1,58 +1,18 @@
-import { makeAutoObservable, observable, runInAction } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 
-import { supabase } from '@/state/supabase-utils';
 import {
   createLocalUserId,
   createTimestamp,
-  userRoles,
   type User,
   type UserFormValues,
-  type UserRole,
 } from '@/state/schemas/user-schema';
-
-type SupabaseUserRow = {
-  id: number | string;
-  createdAt: string;
-  updatedAt: string;
-  fullName: string;
-  role: string;
-  dateOfBirth: string | null;
-};
-
-type SupabaseMutationResult = {
-  data?: SupabaseUserRow | SupabaseUserRow[] | null;
-  error?: { message?: string } | null;
-};
-
-type SupabaseQueryResult = {
-  data?: SupabaseUserRow[] | null;
-  error?: { message?: string } | null;
-};
-
-type SupabaseUsersTable = {
-  delete: () => {
-    eq: (column: 'id', value: number) => Promise<SupabaseMutationResult>;
-  };
-  insert: (row: SupabaseUserRow) => {
-    select: () => {
-      single: () => Promise<SupabaseMutationResult>;
-    };
-  };
-  select: () => {
-    order: (column: 'fullName', options: { ascending: boolean }) => Promise<SupabaseQueryResult>;
-  };
-  update: (row: Partial<SupabaseUserRow>) => {
-    eq: (column: 'id', value: number) => {
-      select: () => {
-        single: () => Promise<SupabaseMutationResult>;
-      };
-    };
-  };
-};
-
-export type UsersSupabaseClient = {
-  from: (tableName: 'users') => SupabaseUsersTable;
-};
+import { createSQLiteUsersProvider } from '@/state/users-data/sqlite-users-provider';
+import { createSupabaseUsersProvider } from '@/state/users-data/supabase-users-provider';
+import {
+  defaultUsersStorageSource,
+  type UsersDataProvider,
+  type UsersStorageSource,
+} from '@/state/users-data/users-data-provider';
 
 const initialUsers: User[] = [
   /*{
@@ -73,63 +33,47 @@ const initialUsers: User[] = [
   },*/
 ];
 
-function toUser(row: SupabaseUserRow): User {
+type UsersDataProviders = Record<UsersStorageSource, UsersDataProvider>;
+
+type UsersStoreOptions = {
+  initialStorageSource?: UsersStorageSource;
+  providers?: UsersDataProviders;
+};
+
+function createDefaultUsersDataProviders(): UsersDataProviders {
   return {
-    id: String(row.id),
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-    fullName: row.fullName,
-    role: userRoles.includes(row.role as UserRole) ? (row.role as UserRole) : 'MEMBER',
-    dateOfBirth: row.dateOfBirth ?? '',
+    sqlite: createSQLiteUsersProvider(),
+    supabase: createSupabaseUsersProvider(),
   };
 }
 
-function toSupabaseId(userId: string) {
-  const numericId = Number(userId);
-
-  return Number.isSafeInteger(numericId) ? numericId : undefined;
-}
-
-function toSupabaseRow(user: User): SupabaseUserRow | undefined {
-  const id = toSupabaseId(user.id);
-
-  if (id === undefined) {
-    return undefined;
-  }
-
-  return {
-    id,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    fullName: user.fullName,
-    role: user.role,
-    dateOfBirth: user.dateOfBirth || null,
-  };
-}
-
-function toSupabaseUpdate(user: User): Partial<SupabaseUserRow> {
-  return {
-    updatedAt: user.updatedAt,
-    fullName: user.fullName,
-    role: user.role,
-    dateOfBirth: user.dateOfBirth || null,
-  };
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : 'Storage request failed.';
 }
 
 export class UsersStore {
-  private supabaseClient: UsersSupabaseClient | null;
+  private providers: UsersDataProviders;
   private syncErrorTimeout: ReturnType<typeof setTimeout> | undefined;
   private usersLoadingTimeout: ReturnType<typeof setTimeout> | undefined;
   private usersLoadRequestId = 0;
 
+  storageSource: UsersStorageSource;
   users: User[] = initialUsers;
   isLoadingUsers = false;
   syncErrorMessage = '';
 
-  constructor(supabaseClient: UsersSupabaseClient | null = supabase as UsersSupabaseClient | null) {
-    this.supabaseClient = supabaseClient;
+  constructor({
+    initialStorageSource = defaultUsersStorageSource,
+    providers = createDefaultUsersDataProviders(),
+  }: UsersStoreOptions = {}) {
+    this.providers = providers;
+    this.storageSource = initialStorageSource;
     makeAutoObservable(this, {}, { autoBind: true });
     void this.loadUsers();
+  }
+
+  private get provider() {
+    return this.providers[this.storageSource];
   }
 
   get sortedUsers() {
@@ -143,34 +87,37 @@ export class UsersStore {
   }
 
   async loadUsers() {
-    if (!this.supabaseClient) {
-      return;
-    }
-
     const requestId = this.startUsersLoading();
     const startedAt = Date.now();
 
     try {
-      const { data, error } = await this.supabaseClient
-        .from('users')
-        .select()
-        .order('fullName', { ascending: true });
+      const users = await this.provider.loadUsers();
 
       if (requestId !== this.usersLoadRequestId) {
         return;
       }
 
-      if (error) {
-        this.showSyncError(`Could not load users: ${error.message ?? 'Supabase request failed.'}`);
-        return;
-      }
-
       runInAction(() => {
-        this.users = (data ?? []).map(toUser);
+        this.users = users;
       });
+    } catch (error) {
+      this.showSyncError(`Could not load users: ${getErrorMessage(error)}`);
     } finally {
       this.finishUsersLoading(requestId, startedAt);
     }
+  }
+
+  async setStorageSource(storageSource: UsersStorageSource) {
+    if (storageSource === this.storageSource) {
+      return;
+    }
+
+    runInAction(() => {
+      this.storageSource = storageSource;
+      this.users = [];
+    });
+
+    await this.loadUsers();
   }
 
   async createUser(values: UserFormValues) {
@@ -182,9 +129,13 @@ export class UsersStore {
     };
 
     this.users.push(newUser);
-    await this.createSupabaseUser(newUser);
+    const syncedUser = await this.createProviderUser(newUser);
 
-    return newUser;
+    if (syncedUser) {
+      this.replaceUser(newUser.id, syncedUser);
+    }
+
+    return syncedUser ?? newUser;
   }
 
   async updateUser(userId: string, values: UserFormValues) {
@@ -201,9 +152,13 @@ export class UsersStore {
     };
 
     this.users[userIndex] = updatedUser;
-    await this.updateSupabaseUser(updatedUser);
+    const syncedUser = await this.updateProviderUser(updatedUser);
 
-    return updatedUser;
+    if (syncedUser) {
+      this.replaceUser(updatedUser.id, syncedUser);
+    }
+
+    return syncedUser ?? updatedUser;
   }
 
   async deleteUser(userId: string) {
@@ -211,81 +166,36 @@ export class UsersStore {
       this.users = this.users.filter((user) => user.id !== userId);
     });
 
-    await this.deleteSupabaseUser(userId);
+    await this.deleteProviderUser(userId);
 
     runInAction(() => {
       this.users = this.users.filter((user) => user.id !== userId);
     });
   }
 
-  private async createSupabaseUser(user: User) {
-    if (!this.supabaseClient) {
-      return;
-    }
-
-    const row = toSupabaseRow(user);
-
-    if (!row) {
-      this.showSyncError('Could not sync user: local ID is not compatible with Supabase.');
-      return;
-    }
-
-    const { data, error } = await this.supabaseClient.from('users').insert(row).select().single();
-
-    if (error) {
-      this.showSyncError(`Could not sync created user: ${error.message ?? 'Supabase request failed.'}`);
-      return;
-    }
-
-    if (data && !Array.isArray(data)) {
-      this.replaceUser(user.id, toUser(data));
+  private async createProviderUser(user: User) {
+    try {
+      return await this.provider.createUser(user);
+    } catch (error) {
+      this.showSyncError(`Could not sync created user: ${getErrorMessage(error)}`);
+      return undefined;
     }
   }
 
-  private async updateSupabaseUser(user: User) {
-    if (!this.supabaseClient) {
-      return;
-    }
-
-    const id = toSupabaseId(user.id);
-
-    if (id === undefined) {
-      this.showSyncError('Could not sync user: local ID is not compatible with Supabase.');
-      return;
-    }
-
-    const { data, error } = await this.supabaseClient
-      .from('users')
-      .update(toSupabaseUpdate(user))
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      this.showSyncError(`Could not sync updated user: ${error.message ?? 'Supabase request failed.'}`);
-      return;
-    }
-
-    if (data && !Array.isArray(data)) {
-      this.replaceUser(user.id, toUser(data));
+  private async updateProviderUser(user: User) {
+    try {
+      return await this.provider.updateUser(user);
+    } catch (error) {
+      this.showSyncError(`Could not sync updated user: ${getErrorMessage(error)}`);
+      return undefined;
     }
   }
 
-  private async deleteSupabaseUser(userId: string) {
-    if (!this.supabaseClient) {
-      return;
-    }
-
-    const id = toSupabaseId(userId);
-
-    if (id === undefined) {
-      return;
-    }
-
-    const { error } = await this.supabaseClient.from('users').delete().eq('id', id);
-
-    if (error) {
-      this.showSyncError(`Could not sync deleted user: ${error.message ?? 'Supabase request failed.'}`);
+  private async deleteProviderUser(userId: string) {
+    try {
+      await this.provider.deleteUser(userId);
+    } catch (error) {
+      this.showSyncError(`Could not sync deleted user: ${getErrorMessage(error)}`);
     }
   }
 
@@ -348,6 +258,6 @@ export class UsersStore {
   }
 }
 
-export function createUsersStore(supabaseClient?: UsersSupabaseClient | null) {
-  return new UsersStore(supabaseClient);
+export function createUsersStore(options?: UsersStoreOptions) {
+  return new UsersStore(options);
 }
