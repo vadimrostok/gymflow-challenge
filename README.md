@@ -1,35 +1,94 @@
 # Gymflow Challenge
 
-Shared Expo app for the Gymflow frontend task. The first implementation iteration includes the required users list, create/edit form, Zod validation, MobX state, responsive React Native Web UI, a layout-level theme switcher, and smoke tests.
+Gymflow Challenge is a shared Expo app for managing a small staff/member user list across web and native targets. It showcases Expo Router, React Native Web, NativeWind, MobX, Zod + React Hook Form, optional Supabase sync, persisted app preferences, solarized light/dark/auto themes, Motion/Reanimated animations, and Playwright/Detox smoke coverage. The core CRUD flow works without backend secrets; when Supabase env vars are present, the store can load and sync users remotely. The web build is static and can be deployed to GitHub Pages, including network-served painting assets used by the form parallax header.
 
-## Run
+## Install
 
 ```bash
-npm install
+npm ci
+```
+
+Use `npm ci` instead when you want a clean install from `package-lock.json`, such as in CI. If you get dependency/build issues (that might or might not be related to node and npm versions), I'd advise you to remove `node_modules` and `package-lock.json` and try your luck with `npm i`.
+
+## Run In Development
+
+Web:
+
+```bash
 npm run web
 ```
 
-Expo can also launch native targets:
+iOS simulator:
 
 ```bash
 npm run ios
+```
+
+Android emulator:
+
+```bash
 npm run android
 ```
 
-## Test
+## Run On Real Devices
+
+For the full native app with the same native modules used by simulator builds:
+
+```bash
+npm run ios -- --device
+npm run android -- --device
+```
+
+For a quick Expo Go check, start the dev server with a tunnel and scan the QR code from the Expo Go app:
+
+```bash
+npx expo start --tunnel
+```
+
+## Tests
+
+Unit and UI tests:
+
+```bash
+npm test
+```
+
+Lint and typecheck:
 
 ```bash
 npm run lint
-npm test
 npx tsc --noEmit
 ```
 
-## Current Scope
+All configured e2e tests:
 
-- `/` redirects to `/users`.
-- `/users` shows the staff/member list and list-item remove actions.
-- `/users/new` creates a user.
-- `/users/[id]` edits a user and includes a form-level remove action.
-- The header theme button cycles auto, light, and dark modes on every screen.
+```bash
+npm run e2e:all
+```
 
-SQLite persistence, Supabase auth/sync, secure mode, deep-link export, Playwright, and Detox are planned next. See [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md).
+Web e2e only:
+
+```bash
+npm run e2e:web
+```
+
+iOS Detox e2e only:
+
+```bash
+npm run e2e:ios
+```
+
+Detox requires Xcode simulator tooling and `applesimutils`:
+
+```bash
+brew tap wix/brew
+brew install applesimutils
+```
+
+## Docs
+
+- [Challenge Spec](docs/CHALLENGE-SPEC.md)
+- [(Codex-generated) implementation plan](docs/IMPLEMENTATION-PLAN.PRE.md), and [updated version](docs/IMPLEMENTATION-PLAN.POST.md)
+- [Manual draft](docs/IMPLEMENTATION-PLAN.draft.md) and [progress log](docs/.progress.log)
+- [GitHub Pages deployment](docs/GITHUB-PAGES-DEPLOYMENT.md)
+- [AGENTS.md](docs/AGENTS.md)

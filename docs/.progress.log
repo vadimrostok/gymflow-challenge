@@ -108,3 +108,7 @@
 
 # iteration 5
 - move add user button on mobile to the right
+- separate e2e web and detox jobs (detox is very slow in ci)
+- screenshot/record mobile usage
+- set up proper splash screen
+- background -> foreground animation
