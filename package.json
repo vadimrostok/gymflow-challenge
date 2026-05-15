@@ -17,9 +17,11 @@
     "e2e:ios:build": "detox build --configuration ios.sim.debug",
     "e2e:ios": "npm run e2e:ios:build && detox test --configuration ios.sim.debug --cleanup",
     "e2e:android": "detox test --configuration android.emu.debug --cleanup",
-    "e2e:all": "npm run e2e:web && npm run e2e:ios && npm run e2e:android",
+    "e2e:mobile:ios": "npm run e2e:ios",
+    "e2e:detox": "npm run e2e:mobile:ios",
+    "e2e:all": "npm run e2e:web && npm run e2e:mobile:ios && npm run e2e:android",
     "e2e:full": "npm run e2e:all",
-    "e2e:mobile": "npm run e2e:ios",
+    "e2e:mobile": "npm run e2e:mobile:ios",
     "e2e:mobile:watch": "npm run e2e:ios:build && detox test --configuration ios.sim.debug -- --watch --runInBand"
   },
   "dependencies": {
