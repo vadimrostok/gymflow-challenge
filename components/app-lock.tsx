@@ -1,6 +1,6 @@
 import * as LocalAuthentication from 'expo-local-authentication';
 import { AppState, AppStateStatus, Button, Text, View } from 'react-native';
-import { Fragment, PropsWithChildren, useEffect, useRef, useState } from 'react';
+import { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { preferencesStorage } from '@/state/storage/preferences-storage';
 
 export function AppLock({ children }: PropsWithChildren) {
