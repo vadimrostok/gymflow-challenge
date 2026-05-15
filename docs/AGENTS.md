@@ -1,5 +1,4 @@
-- Run existing unit tests before summarising your changes. 
-- Run existing integration tests before summarising if you suspect they might be affected.
+- Run existing unit tests before summarising your changes only for big changes (5+ min AI thinking, 250loc, or when you suspect something might've broken - use your AI's common sense), meaning small changes and changes during hot debugging/developing phases can be omitted; same is the case for running the existing integration tests - run only when you suspect they might be affected.
 - Cover new logic with unit tests, new UI with testing-library unit tests, but don't overdo it, cover the most important parts.
 - Cover milestone features with e2e tests for web and mobile separately.
 - Ensure responsive design still works after UI changes (at least by analysing the changes, and every once in a while, by running the app in MCP or via Computer Use).

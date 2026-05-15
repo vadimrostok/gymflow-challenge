@@ -1,72 +1,54 @@
-import { ReactElement, useEffect, useState } from 'react';
-import { Platform, Pressable, View } from 'react-native';
+import { ReactElement, useCallback, useState } from 'react';
+import { Platform, View } from 'react-native';
+import * as LocalAuthentication from 'expo-local-authentication';
+import { LocalAuthenticationResult } from 'expo-local-authentication';
 
 import { ThemedText } from '@/components/themed-text';
 import { Colors, SharedColors } from '@/constants/theme';
-import { useThemeMode } from '@/state/context/theme-mode';
 import { preferencesStorage } from '@/state/storage/preferences-storage';
 import { ScreenWithFooter } from '@/components/screen-with-footer';
+import { AppPreferences } from '@/state/storage/preferences-types';
+import { SettingsCheckbox } from '@/components/settings-checkbox';
 
-type SettingsCheckboxProps = {
-  testID: string;
-  isEnabled: boolean;
-  enabledSetStateFn: (changeFn: (currentIsEnabled: boolean) => boolean) => void;
-  accessibilityLabel: string;
-  label: string;
-  description: string;
+function updatePreferences(keyValue: { [K in keyof Omit<AppPreferences, 'theme'>]: boolean }) {
+  const preferences = preferencesStorage.getPreferences() ?? {};
+  preferencesStorage.setPreferences({
+    ...preferences,
+     ...keyValue,
+  });
 }
-const SettingsCheckbox = (
-  { testID, isEnabled, enabledSetStateFn, accessibilityLabel, label, description } : SettingsCheckboxProps
-): ReactElement => (
-  <Pressable
-    testID={testID}
-    accessibilityLabel={accessibilityLabel}
-    accessibilityRole="checkbox"
-    accessibilityState={{ checked: isEnabled }}
-    onPress={() => enabledSetStateFn((currentValue) => !currentValue)}
-    className="flex-row items-start gap-3 rounded-lg border border-white bg-solarized-base2 p-4 active:opacity-75 dark:bg-solarized-base02"
-  >
-    <View
-      className={
-        isEnabled
-          ? 'mt-0.5 h-5 w-5 items-center justify-center rounded border border-gymflow-primary bg-gymflow-primary dark:border-gymflow-primaryDark dark:bg-gymflow-primaryDark'
-          : 'mt-0.5 h-5 w-5 rounded border border-solarized-base1 bg-solarized-base3 dark:border-solarized-base01 dark:bg-solarized-base03'
-      }>
-      {isEnabled ? (
-        <View style={styles.checkboxCheckmark} />
-      ) : null}
-    </View>
-    <View className="flex-1 gap-1">
-      <ThemedText type="defaultSemiBold">{label}</ThemedText>
-      <ThemedText
-        lightColor={Colors.light.mutedText}
-        darkColor={Colors.dark.mutedText}
-        className="text-sm leading-5">
-        {description}
-      </ThemedText>
-    </View>
-  </Pressable>
-);
 
 export function SettingsScreen(): ReactElement {
   const preferences = preferencesStorage.getPreferences();
   const [isSecureModeEnabled, setIsSecureModeEnabled] = useState(preferences?.isSecureModeEnabled ?? false);
   const [showUsersListDeleteButton, setShowUsersListDeleteButton] =
     useState(preferences?.showUsersListDeleteButton ?? false);
+  const [localAuthErrorMessage, setLocalAuthErrorMessage] = useState<string | null>(null);
 
-  useEffect((): void => {
-    const preferences = preferencesStorage.getPreferences() ?? {};
-    if (
-      isSecureModeEnabled !== preferences.isSecureModeEnabled
-      || showUsersListDeleteButton !== preferences.showUsersListDeleteButton
-    ) {
-      preferencesStorage.setPreferences({
-        ...preferences,
-        isSecureModeEnabled,
-        showUsersListDeleteButton,
-      });
+  const handleShowUsersListDeleteButtonToggle = useCallback(() => {
+    setShowUsersListDeleteButton((currentValue) => {
+      updatePreferences({ showUsersListDeleteButton: !currentValue });
+      return !currentValue;
+    });
+  }, []);
+  const handleSecureModeToggle = useCallback(async () => {
+    let isAuthorisedPreference = false;
+    if (isSecureModeEnabled) {
+      setIsSecureModeEnabled(false);
+    } else {
+      const authResult: LocalAuthenticationResult = await LocalAuthentication.authenticateAsync()
+      const { success } = authResult;
+      if (success) {
+        setIsSecureModeEnabled(true);
+        isAuthorisedPreference = true;
+      } else {
+        const { error } = authResult;
+        setLocalAuthErrorMessage(error === 'user_cancel' ? 'Cancelled' : 'Failed to authenticate');
+      }
     }
-  }, [isSecureModeEnabled, showUsersListDeleteButton])
+
+    updatePreferences({ isSecureModeEnabled: isAuthorisedPreference });
+  }, [isSecureModeEnabled])
 
   return (
     <View className="flex-1 bg-solarized-base3 dark:bg-solarized-base03">
@@ -78,20 +60,35 @@ export function SettingsScreen(): ReactElement {
           </ThemedText>
         </View>
 
-        {/* // to bo done in future, maybe: */}
-        {/*{Platform.OS !== 'web' && <SettingsCheckbox
-          testID="settings-secure-mode-toggle"
-          isEnabled={isSecureModeEnabled}
-          enabledSetStateFn={setIsSecureModeEnabled}
-          accessibilityLabel="Secure mode"
-          label="Secure mode"
-          description="Toggle for the biometric/app-lock behaviour"
-        />}*/}
+        {Platform.OS !== 'web' && (
+          <>
+            <SettingsCheckbox
+              testID="settings-secure-mode-toggle"
+              isEnabled={isSecureModeEnabled}
+              enabledSetStateFn={handleSecureModeToggle}
+              accessibilityLabel="Secure mode"
+              label="Secure mode"
+              description="Toggle for the biometric/app-lock behaviour"
+            />
+            {localAuthErrorMessage ? (
+              <View
+                className="rounded-lg border border-solarized-red/40 bg-solarized-red/10 px-3 py-2">
+                <ThemedText
+                  lightColor={Colors.light.errorText}
+                  darkColor={Colors.dark.errorText}
+                  className="text-sm leading-5"
+                >
+                  {localAuthErrorMessage}
+                </ThemedText>
+              </View>
+            ) : null}
+          </>
+        )}
 
         <SettingsCheckbox
           testID="users-list-delete-toggle"
           isEnabled={showUsersListDeleteButton}
-          enabledSetStateFn={setShowUsersListDeleteButton}
+          enabledSetStateFn={handleShowUsersListDeleteButtonToggle}
           accessibilityLabel="Show delete button on users list"
           label="Deletable user list items"
           description="Show delete button on users list"
@@ -100,16 +97,3 @@ export function SettingsScreen(): ReactElement {
     </View>
   );
 }
-
-const styles = {
-  checkboxCheckmark: {
-    borderBottomColor: SharedColors.white,
-    borderBottomWidth: 3,
-    borderRightColor: SharedColors.white,
-    borderRightWidth: 3,
-    height: 12,
-    marginTop: -2,
-    transform: [{ rotate: '45deg' }],
-    width: 7,
-  },
-};

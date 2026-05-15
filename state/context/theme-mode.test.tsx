@@ -24,6 +24,8 @@ function ThemeModeProbe() {
 describe('ThemeModeProvider', () => {
   it('hydrates and persists theme fields through the preferences adapter', async () => {
     const storage = createMemoryPreferencesStorage({
+      isSecureModeEnabled: true,
+      showUsersListDeleteButton: true,
       theme: { isAuto: false, mode: 'dark' },
     });
 
@@ -38,13 +40,21 @@ describe('ThemeModeProvider', () => {
     fireEvent.press(screen.getByText('cycle'));
 
     await waitFor(() => {
-      expect(storage.getPreferences()).toEqual({ theme: { isAuto: false, mode: 'light' } });
+      expect(storage.getPreferences()).toEqual({
+        isSecureModeEnabled: true,
+        showUsersListDeleteButton: true,
+        theme: { isAuto: false, mode: 'light' },
+      });
     });
 
     fireEvent.press(screen.getByText('auto'));
 
     await waitFor(() => {
-      expect(storage.getPreferences()).toEqual({ theme: { isAuto: true, mode: 'light' } });
+      expect(storage.getPreferences()).toEqual({
+        isSecureModeEnabled: true,
+        showUsersListDeleteButton: true,
+        theme: { isAuto: true, mode: 'light' },
+      });
     });
   });
 });

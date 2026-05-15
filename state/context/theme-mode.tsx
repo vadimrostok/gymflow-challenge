@@ -28,6 +28,18 @@ function readStoredPreferences(storage: AppPreferencesStorage): AppPreferences |
   }
 }
 
+function writeThemePreferences(
+  storage: AppPreferencesStorage,
+  theme: NonNullable<AppPreferences['theme']>
+) {
+  const currentPreferences = readStoredPreferences(storage) ?? {};
+
+  storage.setPreferences({
+    ...currentPreferences,
+    theme,
+  });
+}
+
 type ThemeModeProviderProps = PropsWithChildren<{
   storage?: AppPreferencesStorage;
 }>;
@@ -76,7 +88,7 @@ export function ThemeModeProvider({
 
   useEffect(() => {
     try {
-      storage.setPreferences({ theme: { isAuto, mode: storedMode } });
+      writeThemePreferences(storage, { isAuto, mode: storedMode });
     } catch {
       // Preferences are nice-to-have; theme switching itself should still work if storage fails.
     }
